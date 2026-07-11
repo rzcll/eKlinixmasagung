@@ -112,6 +112,9 @@
 </head>
 <body class="text-sm bg-slate-50 flex flex-col h-screen h-[100dvh] overflow-hidden w-full">
 
+    <!-- Datalist untuk Sugesti Diagnosa -->
+    <datalist id="listDiagnosa"></datalist>
+
     <!-- TOAST NOTIFICATION -->
     <div id="toast-container" class="fixed top-6 right-6 z-[500] flex flex-col gap-3 pointer-events-none w-[90%] md:w-auto max-w-sm"></div>
 
@@ -123,8 +126,7 @@
             <form onsubmit="handleLogin(event)" class="space-y-6">
                 
                 <div class="text-center w-full mb-6 flex justify-center">
-                    <!-- Logo Interaktif di Menu Login -->
-                    <img src="https://github.com/rzcll/eKlinixmasagung/blob/main/logo%20eklinix.png?raw=true" alt="eKlinik Logo" class="h-20 md:h-24 w-auto object-contain logo-interactive">
+                    <img src="https://github.com/rzcll/eKlinixmasagung/blob/main/logo%20eklinix.png?raw=true" alt="eKlinik Logo" class="h-20 md:h-24 w-auto object-contain logo-login-interactive">
                 </div>
                 
                 <div class="w-full flex flex-col gap-1.5">
@@ -284,13 +286,13 @@
                     </div>
                 </div>
                 <div class="flex-1 overflow-x-auto overflow-y-auto rounded-xl border border-slate-200">
-                    <table class="w-full text-left min-w-[600px] h-full relative">
+                    <table class="w-full text-left min-w-[700px] h-full relative">
                         <thead class="bg-indigo-50 text-indigo-700 text-xs uppercase font-bold sticky top-0 shadow-sm z-10">
                             <tr>
-                                <th class="p-3 border-b border-indigo-100">Tgl Kunjungan</th>
-                                <th class="p-3 border-b border-indigo-100">Keluhan</th>
-                                <th class="p-3 border-b border-indigo-100">Vital Sign</th>
-                                <th class="p-3 border-b border-indigo-100">Diagnosa/Resep</th>
+                                <th class="p-3 border-b border-indigo-100 w-32">Tgl Kunjungan</th>
+                                <th class="p-3 border-b border-indigo-100">Anamnesa & Fisik</th>
+                                <th class="p-3 border-b border-indigo-100 w-24">Vital Sign</th>
+                                <th class="p-3 border-b border-indigo-100 w-64">Diagnosa & Resep</th>
                             </tr>
                         </thead>
                         <tbody id="tableRiwayatList" class="text-sm text-slate-600 divide-y divide-slate-100 bg-white">
@@ -328,7 +330,7 @@
                     <button type="button" onclick="bukaRiwayatDariPelayanan()" class="text-indigo-600 border border-indigo-200 bg-white hover:bg-indigo-50 px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-colors flex items-center shadow-sm">
                         <i class="fas fa-history mr-1.5"></i> <span class="hidden sm:inline">Histori</span>
                     </button>
-                    <button onclick="tutupFormPelayanan()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-rose-500 transition-colors flex items-center justify-center">
+                    <button type="button" onclick="tutupFormPelayanan()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-rose-500 transition-colors flex items-center justify-center">
                         <i class="fas fa-times text-lg"></i>
                     </button>
                 </div>
@@ -348,9 +350,15 @@
                     </div>
 
                     <form id="formDataPelayanan" onsubmit="simpanDataPelayanan(event)" class="flex-1 flex flex-col space-y-4">
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm shrink-0">
-                            <label class="form-label text-sm md:text-base mb-2"><i class="fas fa-comment-medical text-blue-500 mr-2"></i>Keluhan Utama <span class="text-rose-500">*</span></label>
-                            <textarea id="pel_keluhan" required rows="2" placeholder="Anamnesa / Keluhan saat datang..." class="form-input text-sm md:text-base"></textarea>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 shrink-0">
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                <label class="form-label text-sm md:text-base mb-2"><i class="fas fa-comment-medical text-blue-500 mr-2"></i>Keluhan Utama <span class="text-rose-500">*</span></label>
+                                <textarea id="pel_keluhan" required rows="2" placeholder="Anamnesa / Keluhan saat datang..." class="form-input text-sm md:text-base"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                <label class="form-label text-sm md:text-base mb-2"><i class="fas fa-child text-teal-500 mr-2"></i>Pemeriksaan Fisik</label>
+                                <textarea id="pel_pemeriksaan_fisik" rows="2" placeholder="Hasil pemeriksaan fisik (Inspeksi, Palpasi, Auskultasi, dll)..." class="form-input text-sm md:text-base"></textarea>
+                            </div>
                         </div>
 
                         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm shrink-0">
@@ -367,13 +375,24 @@
                         </div>
 
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 shrink-0">
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                                <label class="form-label text-sm md:text-base mb-2"><i class="fas fa-vial text-purple-500 mr-2"></i>Pemeriksaan Lab</label>
-                                <textarea id="pel_laborat" rows="3" class="form-input text-sm h-[80px]" placeholder="Hasil GDA, AU, Kolesterol..."></textarea>
+                            <div class="space-y-4 flex flex-col">
+                                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                    <label class="form-label text-sm md:text-base mb-2"><i class="fas fa-vial text-purple-500 mr-2"></i>Pemeriksaan Lab</label>
+                                    <textarea id="pel_laborat" rows="2" class="form-input text-sm h-[60px]" placeholder="Hasil GDA, AU, Kolesterol..."></textarea>
+                                </div>
+                                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex-1 flex flex-col">
+                                    <label class="form-label text-sm md:text-base mb-2"><i class="fas fa-diagnoses text-indigo-500 mr-2"></i>Diagnosa Medis / ICD-10 <span class="text-rose-500">*</span></label>
+                                    <div class="space-y-2 flex-1">
+                                        <input type="text" id="pel_diagnosa1" list="listDiagnosa" required class="form-input text-sm font-bold text-indigo-700" placeholder="1. Diagnosa Utama..." autocomplete="off">
+                                        <input type="text" id="pel_diagnosa2" list="listDiagnosa" class="form-input text-sm text-slate-700" placeholder="2. Diagnosa Sekunder (Opsional)..." autocomplete="off">
+                                        <input type="text" id="pel_diagnosa3" list="listDiagnosa" class="form-input text-sm text-slate-700" placeholder="3. Diagnosa Tambahan (Opsional)..." autocomplete="off">
+                                    </div>
+                                    <p class="text-[10px] text-slate-400 mt-2"><i class="fas fa-info-circle"></i> Diagnosa baru otomatis tersimpan sbg sugesti berikutnya.</p>
+                                </div>
                             </div>
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col">
-                                <label class="form-label text-sm md:text-base mb-2"><i class="fas fa-pills text-teal-500 mr-2"></i>Diagnosa & Resep <span class="text-rose-500">*</span></label>
-                                <textarea id="pel_resep" required rows="3" class="form-input font-mono bg-yellow-50/50 border-yellow-200 text-sm flex-1 min-h-[80px]" placeholder="R/ Paracetamol 500mg S 3dd1..."></textarea>
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col h-full min-h-[200px]">
+                                <label class="form-label text-sm md:text-base mb-2"><i class="fas fa-pills text-teal-500 mr-2"></i>Resep Obat (R/) <span class="text-rose-500">*</span></label>
+                                <textarea id="pel_resep" required rows="6" class="form-input font-mono bg-yellow-50/50 border-yellow-200 text-sm flex-1" placeholder="R/ Paracetamol 500mg S 3dd1..."></textarea>
                             </div>
                         </div>
 
@@ -504,7 +523,6 @@
             <div class="flex flex-wrap items-center py-2 md:py-3 w-full">
                 <!-- LOGO TEXT & IMAGE -->
                 <div class="pr-4 md:pr-8 border-r border-teal-600/50 flex items-center shrink-0">
-                    <!-- Logo Putih Interaktif di Navbar -->
                     <img src="https://github.com/rzcll/eKlinixmasagung/blob/main/logo%20eklinix.png?raw=true" alt="eKlinik Logo" class="h-10 md:h-12 w-auto object-contain logo-app">
                 </div>
                 
@@ -566,6 +584,14 @@
                                 <li onclick="switchView('laporan_keuangan')" class="p-2 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center gap-3 group/item">
                                     <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-file-invoice-dollar"></i></div>
                                     <div><span class="font-bold text-slate-700 group-hover/item:text-emerald-700 transition-colors">Pendapatan Klinik</span><div class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5">Laporan keuangan</div></div>
+                                </li>
+                                <li onclick="switchView('laporan_penyakit')" class="p-2 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center gap-3 group/item">
+                                    <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center group-hover/item:bg-rose-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-viruses"></i></div>
+                                    <div><span class="font-bold text-slate-700 group-hover/item:text-rose-700 transition-colors">10 Penyakit Teratas</span><div class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5">Statistik diagnosa</div></div>
+                                </li>
+                                <li onclick="switchView('laporan_kunjungan_diagnosa')" class="p-2 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center gap-3 group/item">
+                                    <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover/item:bg-indigo-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-notes-medical"></i></div>
+                                    <div><span class="font-bold text-slate-700 group-hover/item:text-indigo-700 transition-colors">Kunjungan Diagnosa</span><div class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5">Daftar pasien per diagnosa</div></div>
                                 </li>
                             </ul>
                         </div>
@@ -781,6 +807,65 @@
             </div>
         </div>
 
+        <div id="view-laporan-penyakit" class="bg-white border border-slate-200 rounded-xl md:rounded-2xl shadow-sm hidden flex-col h-full overflow-hidden transition-all duration-300 w-full">
+            <div class="shrink-0 bg-rose-50 border-b border-rose-100 px-4 md:px-6 py-3 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
+                <h1 class="text-lg md:text-xl font-bold text-rose-800 flex items-center gap-3 shrink-0"><div class="w-8 h-8 bg-white text-rose-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-viruses"></i></div>10 Penyakit Terbanyak</h1>
+                <div class="flex flex-wrap sm:flex-nowrap gap-2 items-center w-full lg:w-auto">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 bg-white border border-rose-200 p-1 rounded-lg shadow-sm w-full sm:w-auto">
+                        <div class="flex items-center w-full sm:w-auto">
+                            <label class="text-[10px] font-bold text-slate-500 pl-2 w-12 sm:w-auto">Mulai:</label>
+                            <input type="date" id="penyakit_start" class="form-input text-xs py-1 border-none focus:ring-0 bg-transparent w-full sm:w-auto shadow-none" style="box-shadow:none !important;" onchange="renderLaporanPenyakit()">
+                        </div>
+                        <div class="flex items-center w-full sm:w-auto sm:border-l border-rose-100 sm:pl-2">
+                            <label class="text-[10px] font-bold text-slate-500 pl-2 sm:pl-0 w-12 sm:w-auto">Sampai:</label>
+                            <input type="date" id="penyakit_end" class="form-input text-xs py-1 border-none focus:ring-0 bg-transparent w-full sm:w-auto shadow-none" style="box-shadow:none !important;" onchange="renderLaporanPenyakit()">
+                        </div>
+                    </div>
+                    <button onclick="downloadLaporan('penyakit')" class="w-full sm:w-auto bg-rose-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-rose-700 flex items-center justify-center gap-2"><i class="fas fa-file-excel"></i> Export CSV</button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-auto bg-white relative">
+                <table class="w-full text-left whitespace-nowrap min-w-[700px]">
+                    <thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-100 sticky top-0 z-10 shadow-sm border-b border-slate-200">
+                        <tr><th class="p-3 text-center w-16">Peringkat</th><th class="p-3">Nama Penyakit / Diagnosa Medis</th><th class="p-3 text-center w-24">Laki-Laki</th><th class="p-3 text-center w-24">Perempuan</th><th class="p-3 text-center w-32">Total Kasus</th></tr>
+                    </thead>
+                    <tbody id="tableBodyLaporanPenyakit" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody>
+                    <tfoot id="tfootLaporanPenyakit" class="bg-rose-50 font-bold text-rose-800 text-sm sticky bottom-0 border-t border-rose-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]"></tfoot>
+                </table>
+            </div>
+        </div>
+
+        <div id="view-laporan-kunjungan-diagnosa" class="bg-white border border-slate-200 rounded-xl md:rounded-2xl shadow-sm hidden flex-col h-full overflow-hidden transition-all duration-300 w-full">
+            <div class="shrink-0 bg-indigo-50 border-b border-indigo-100 px-4 md:px-6 py-3 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
+                <h1 class="text-lg md:text-xl font-bold text-indigo-800 flex items-center gap-3 shrink-0"><div class="w-8 h-8 bg-white text-indigo-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-notes-medical"></i></div>Kunjungan Diagnosa</h1>
+                <div class="flex flex-wrap sm:flex-nowrap gap-2 items-center w-full lg:w-auto">
+                    <div class="relative w-full sm:w-48 lg:w-64">
+                        <i class="fas fa-search absolute left-3 top-2 text-indigo-400 text-sm z-10"></i>
+                        <input type="text" id="kunjungan_diag_search" list="listDiagnosa" oninput="renderLaporanKunjunganDiagnosa()" placeholder="Ketik Diagnosa..." class="form-input pl-9 text-xs py-1.5 shadow-sm border-indigo-200 focus:border-indigo-500 bg-white" autocomplete="off">
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 bg-white border border-indigo-200 p-1 rounded-lg shadow-sm w-full sm:w-auto">
+                        <div class="flex items-center w-full sm:w-auto">
+                            <label class="text-[10px] font-bold text-slate-500 pl-2 w-12 sm:w-auto">Mulai:</label>
+                            <input type="date" id="kunjungan_diag_start" class="form-input text-xs py-1 border-none focus:ring-0 bg-transparent w-full sm:w-auto shadow-none" style="box-shadow:none !important;" onchange="renderLaporanKunjunganDiagnosa()">
+                        </div>
+                        <div class="flex items-center w-full sm:w-auto sm:border-l border-indigo-100 sm:pl-2">
+                            <label class="text-[10px] font-bold text-slate-500 pl-2 sm:pl-0 w-12 sm:w-auto">Sampai:</label>
+                            <input type="date" id="kunjungan_diag_end" class="form-input text-xs py-1 border-none focus:ring-0 bg-transparent w-full sm:w-auto shadow-none" style="box-shadow:none !important;" onchange="renderLaporanKunjunganDiagnosa()">
+                        </div>
+                    </div>
+                    <button onclick="downloadLaporan('kunjungan_diagnosa')" class="w-full sm:w-auto bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-indigo-700 flex items-center justify-center gap-2"><i class="fas fa-file-excel"></i> Export CSV</button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-auto bg-white relative">
+                <table class="w-full text-left whitespace-nowrap min-w-[900px]">
+                    <thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-100 sticky top-0 z-10 shadow-sm border-b border-slate-200">
+                        <tr><th class="p-3 text-center w-10">#</th><th class="p-3">Waktu</th><th class="p-3">eRM</th><th class="p-3">Nama Pasien</th><th class="p-3 text-center">L/P</th><th class="p-3 text-center">Usia</th><th class="p-3">Alamat Lengkap</th><th class="p-3">Diagnosa Tercatat</th></tr>
+                    </thead>
+                    <tbody id="tableBodyLaporanKunjunganDiagnosa" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- ================= VIEW PENGATURAN ================= -->
         <div id="view-pengaturan" class="bg-white border border-slate-200 rounded-xl md:rounded-2xl shadow-sm hidden flex-col h-full overflow-hidden transition-all duration-300 w-full">
             <div class="shrink-0 bg-slate-50 border-b border-slate-200 px-4 md:px-6 py-3 flex justify-between items-center">
@@ -942,6 +1027,7 @@
         let kalenderMedisInstance = null;
         let fpTglLahir = null; 
         let petugasDataGlobal = [];
+        let setDiagnosaMaster = new Set(); // Menyimpan Diagnosa unik
 
         // --- Konfigurasi Sistem ---
         let appConfig = {
@@ -1096,7 +1182,7 @@
             localStorage.removeItem('erm_username');
             localStorage.removeItem('erm_user_role');
             
-            const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'jadwal-kontrol', 'laporan-kunjungan', 'laporan-keuangan', 'pengaturan'];
+            const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'jadwal-kontrol', 'laporan-kunjungan', 'laporan-keuangan', 'laporan-penyakit', 'laporan-kunjungan-diagnosa', 'pengaturan'];
             viewsList.forEach(v => {
                 const el = document.getElementById(`view-${v}`);
                 if(el) {
@@ -1117,12 +1203,12 @@
         // --- STREAMING_CHUNK:Configuring App Navigation & View Controller ---
         // --- Logika Akses / Pindah View ---
         function switchView(view) {
-            if (currentUserRole !== 'admin' && currentUserId !== 'admin' && (view === 'laporan_kunjungan' || view === 'laporan_keuangan' || view === 'pengaturan')) {
+            if (currentUserRole !== 'admin' && currentUserId !== 'admin' && (view === 'laporan_kunjungan' || view === 'laporan_keuangan' || view === 'laporan_penyakit' || view === 'laporan_kunjungan_diagnosa' || view === 'pengaturan')) {
                 showToast('Akses Ditolak! Hanya Administrator yang dapat membuka menu ini.', 'error');
                 return;
             }
 
-            const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'jadwal-kontrol', 'laporan-kunjungan', 'laporan-keuangan', 'pengaturan'];
+            const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'jadwal-kontrol', 'laporan-kunjungan', 'laporan-keuangan', 'laporan-penyakit', 'laporan-kunjungan-diagnosa', 'pengaturan'];
             
             viewsList.forEach(v => {
                 const el = document.getElementById(`view-${v}`);
@@ -1173,6 +1259,8 @@
             if (view === 'jadwal_kontrol') renderJadwalKontrol();
             if (view === 'laporan_kunjungan') renderLaporanKunjungan();
             if (view === 'laporan_keuangan') renderLaporanKeuangan();
+            if (view === 'laporan_penyakit') renderLaporanPenyakit();
+            if (view === 'laporan_kunjungan_diagnosa') renderLaporanKunjunganDiagnosa();
             if (view === 'pengaturan') fetchPetugasKePengaturan();
         }
 
@@ -1401,6 +1489,8 @@
                     renderJadwalKontrol();
                     renderLaporanKunjungan();
                     renderLaporanKeuangan();
+                    renderLaporanPenyakit();
+                    renderLaporanKunjunganDiagnosa();
                     updateBadges();
 
                 } catch(err) {
@@ -1422,6 +1512,8 @@
                     renderJadwalKontrol();
                     renderLaporanKunjungan();
                     renderLaporanKeuangan();
+                    renderLaporanPenyakit();
+                    renderLaporanKunjunganDiagnosa();
                     updateBadges();
                 }, 500);
             }
@@ -1430,6 +1522,40 @@
                 btn.innerHTML = '<i class="fas fa-trash-alt mr-2"></i> Hapus';
                 btn.disabled = false;
             }, 1000);
+        }
+
+        // --- Logika Autocomplete / Dropdown Diagnosa ---
+        function tambahKeDatalist(diag) {
+            if (!diag || diag.trim() === '') return;
+            const cleanDiag = diag.trim().toUpperCase();
+            if (!setDiagnosaMaster.has(cleanDiag)) {
+                setDiagnosaMaster.add(cleanDiag);
+                const dl = document.getElementById('listDiagnosa');
+                if(dl) dl.innerHTML += `<option value="${cleanDiag}">`;
+                // Simpan ke localStorage agar awet 
+                localStorage.setItem('erm_master_diagnosa', JSON.stringify(Array.from(setDiagnosaMaster)));
+            }
+        }
+
+        function loadMasterDiagnosa() {
+            // Load dari local storage jika ada
+            const saved = localStorage.getItem('erm_master_diagnosa');
+            if (saved) {
+                try {
+                    const arr = JSON.parse(saved);
+                    arr.forEach(d => {
+                        setDiagnosaMaster.add(d);
+                        const dl = document.getElementById('listDiagnosa');
+                        if(dl) dl.innerHTML += `<option value="${d}">`;
+                    });
+                } catch(e){}
+            }
+            // Tambahkan juga history riwayat database (agar sinkron otomatis)
+            riwayatMedisGlobal.forEach(r => {
+                tambahKeDatalist(r.diagnosa1);
+                tambahKeDatalist(r.diagnosa2);
+                tambahKeDatalist(r.diagnosa3);
+            });
         }
 
         async function fetchDataDariSpreadsheet() {
@@ -1470,6 +1596,8 @@
                     
                     if (resRiwayat.data) riwayatMedisGlobal = resRiwayat.data;
                     
+                    loadMasterDiagnosa(); // Muat dropdown diagnosa
+                    
                     renderTabel(patientsData);
                     initKalenderMedis(); 
                     renderTabelPelayananMedis();
@@ -1484,7 +1612,7 @@
                     renderTabel(patientsData); 
                 }
             } else {
-                setTimeout(() => { showToast('Mode Lokal. Silakan isi SUPABASE URL & KEY!', 'warning'); renderTabel(patientsData); initKalenderMedis();}, 800);
+                setTimeout(() => { showToast('Mode Lokal. Silakan isi SUPABASE URL & KEY!', 'warning'); loadMasterDiagnosa(); renderTabel(patientsData); initKalenderMedis();}, 800);
             }
         }
 
@@ -1692,6 +1820,8 @@
                     renderJadwalKontrol();
                     renderLaporanKunjungan();
                     renderLaporanKeuangan();
+                    renderLaporanPenyakit();
+                    renderLaporanKunjunganDiagnosa();
 
                     fetchDataDariSpreadsheet(); 
                 } catch(err) {
@@ -1724,6 +1854,8 @@
                     renderJadwalKontrol();
                     renderLaporanKunjungan();
                     renderLaporanKeuangan();
+                    renderLaporanPenyakit();
+                    renderLaporanKunjunganDiagnosa();
 
                     showToast(`Data ${dataObj.nama} tersimpan (Local Mode)!`, 'success');
                     tutupFormBaru(); 
@@ -1788,7 +1920,20 @@
             if(hist.length === 0) tb.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400">Belum ada riwayat kunjungan pelayanan medis.</td></tr>`;
             else {
                 hist.reverse().forEach(h => {
-                    tb.innerHTML += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-3 align-top"><span class="font-bold text-slate-700">${h.tgl}</span><br><span class="text-xs text-slate-400 font-mono">${h.jam}</span></td><td class="p-3 align-top font-medium text-slate-600">${h.keluhan||'-'}</td><td class="p-3 align-top text-xs text-slate-500"><span class="font-mono bg-slate-100 px-1 rounded">TD: ${h.td||'-'}</span><br><span class="font-mono bg-slate-100 px-1 rounded mt-1 inline-block">S: ${h.suhu?h.suhu+'°C':'-'}</span></td><td class="p-3 align-top font-mono text-xs text-teal-700 bg-teal-50/30 whitespace-pre-wrap rounded-r-lg">${h.resep||'-'}</td></tr>`;
+                    let diagTxt = '';
+                    if(h.diagnosa1) diagTxt += `<div class="font-bold text-blue-700">1. ${h.diagnosa1}</div>`;
+                    if(h.diagnosa2) diagTxt += `<div>2. ${h.diagnosa2}</div>`;
+                    if(h.diagnosa3) diagTxt += `<div>3. ${h.diagnosa3}</div>`;
+
+                    tb.innerHTML += `<tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-3 align-top"><span class="font-bold text-slate-700">${h.tgl}</span><br><span class="text-xs text-slate-400 font-mono">${h.jam}</span></td>
+                        <td class="p-3 align-top text-slate-600"><div class="font-medium mb-1"><b class="text-xs text-slate-400">S:</b> ${h.keluhan||'-'}</div><div class="text-xs text-slate-500 mt-2"><b class="text-[10px] text-slate-400">O:</b> ${h.pemeriksaanFisik||'-'}</div></td>
+                        <td class="p-3 align-top text-xs text-slate-500"><span class="font-mono bg-slate-100 px-1 rounded border border-slate-200">TD: ${h.td||'-'}</span><br><span class="font-mono bg-slate-100 px-1 rounded mt-1 inline-block border border-slate-200">S: ${h.suhu?h.suhu+'°C':'-'}</span></td>
+                        <td class="p-3 align-top text-xs bg-slate-50/50 rounded-r-lg">
+                            <div class="mb-2 border-b border-slate-200 pb-2">${diagTxt || '<i class="text-slate-400">- Belum ada Diagnosa -</i>'}</div>
+                            <div class="font-mono text-teal-700 whitespace-pre-wrap">${h.resep||'-'}</div>
+                        </td>
+                    </tr>`;
                 });
             }
             tampilModal('modalRiwayat', 'modalRiwayatContent');
@@ -1828,7 +1973,7 @@
                     status: 'antrean_medis',
                     tglKontrol: '',
                     statusKontrol: '-',
-                    keluhan: '', td: '', nadi: '', nafas: '', suhu: '', spo2: '', tb: '', bb: '', laborat: '', resep: '', tagihan: 0
+                    keluhan: '', pemeriksaanFisik: '', td: '', nadi: '', nafas: '', suhu: '', spo2: '', tb: '', bb: '', laborat: '', diagnosa1: '', diagnosa2: '', diagnosa3: '', resep: '', tagihan: 0
                 };
                 
                 pelayananData.push(newAntrean);
@@ -1916,7 +2061,15 @@
         function bukaFormPelayanan(erm) {
             rekamMedisAktif = [...pelayananData].reverse().find(p => p.erm === erm); if(!rekamMedisAktif) return;
             document.getElementById('info_nama_pelayanan').textContent = rekamMedisAktif.nama; document.getElementById('info_erm_pelayanan').textContent = rekamMedisAktif.erm;
-            ['keluhan','td','nadi','nafas','suhu','spo2','tb','bb','laborat','resep'].forEach(k => { document.getElementById('pel_'+k).value = rekamMedisAktif[k] || ''; });
+            
+            // Populate value to fields
+            ['keluhan','pemeriksaan_fisik','td','nadi','nafas','suhu','spo2','tb','bb','laborat','diagnosa1','diagnosa2','diagnosa3','resep'].forEach(k => { 
+                const elem = document.getElementById('pel_'+k);
+                // Konversi snake_case html ID ke camelCase db object property khusus untuk pemeriksaanFisik
+                const propertyKey = k === 'pemeriksaan_fisik' ? 'pemeriksaanFisik' : k;
+                if(elem) elem.value = rekamMedisAktif[propertyKey] || ''; 
+            });
+            
             const elTglKontrol = document.getElementById('pel_tgl_kontrol');
             if(elTglKontrol) elTglKontrol.value = rekamMedisAktif.tglKontrol || '';
             tampilModal('modalPelayanan', 'modalPelayananContent');
@@ -1929,8 +2082,18 @@
                 const idx = pelayananData.findIndex(p => p.erm === rekamMedisAktif.erm && p.waktuDaftar === rekamMedisAktif.waktuDaftar);
                 let logRiwayat = null;
                 if(idx !== -1) {
-                    ['keluhan','td','nadi','nafas','suhu','spo2','tb','bb','laborat','resep'].forEach(k => { pelayananData[idx][k] = document.getElementById('pel_'+k).value; });
+                    // Update Local State Data
+                    ['keluhan','pemeriksaan_fisik','td','nadi','nafas','suhu','spo2','tb','bb','laborat','diagnosa1','diagnosa2','diagnosa3','resep'].forEach(k => { 
+                        const elem = document.getElementById('pel_'+k);
+                        const propertyKey = k === 'pemeriksaan_fisik' ? 'pemeriksaanFisik' : k;
+                        if(elem) pelayananData[idx][propertyKey] = elem.value; 
+                    });
                     
+                    // Simpan ke Master Diagnosa untuk Dropdown
+                    tambahKeDatalist(pelayananData[idx].diagnosa1);
+                    tambahKeDatalist(pelayananData[idx].diagnosa2);
+                    tambahKeDatalist(pelayananData[idx].diagnosa3);
+
                     const elTglKontrol = document.getElementById('pel_tgl_kontrol');
                     if(elTglKontrol) {
                         pelayananData[idx].tglKontrol = elTglKontrol.value;
@@ -1942,7 +2105,20 @@
                         pelayananData[idx].waktuMedisSelesai = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                         const ts = new Date(pelayananData[idx].tanggalSistem);
                         
-                        logRiwayat = { erm: pelayananData[idx].erm, tgl: ts.toLocaleDateString('id-ID'), jam: ts.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}), keluhan: pelayananData[idx].keluhan, td: pelayananData[idx].td, suhu: pelayananData[idx].suhu, resep: pelayananData[idx].resep };
+                        // Payload untuk tabel riwayat
+                        logRiwayat = { 
+                            erm: pelayananData[idx].erm, 
+                            tgl: ts.toLocaleDateString('id-ID'), 
+                            jam: ts.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}), 
+                            keluhan: pelayananData[idx].keluhan, 
+                            pemeriksaanFisik: pelayananData[idx].pemeriksaanFisik,
+                            td: pelayananData[idx].td, 
+                            suhu: pelayananData[idx].suhu, 
+                            diagnosa1: pelayananData[idx].diagnosa1,
+                            diagnosa2: pelayananData[idx].diagnosa2,
+                            diagnosa3: pelayananData[idx].diagnosa3,
+                            resep: pelayananData[idx].resep 
+                        };
                         riwayatMedisGlobal.push(logRiwayat);
                     }
                 }
@@ -1953,10 +2129,11 @@
                 if (supabaseClient) {
                     try {
                         const target = pelayananData[idx];
+                        // Payload untuk update tabel pelayanan
                         const dataToServer = {
-                            waktuMedisSelesai: target.waktuMedisSelesai || '', keluhan: target.keluhan || '', td: target.td || '', 
+                            waktuMedisSelesai: target.waktuMedisSelesai || '', keluhan: target.keluhan || '', pemeriksaanFisik: target.pemeriksaanFisik || '', td: target.td || '', 
                             nadi: target.nadi || '', nafas: target.nafas || '', suhu: target.suhu || '', spo2: target.spo2 || '', tb: target.tb || '', 
-                            bb: target.bb || '', laborat: target.laborat || '', resep: target.resep || '', status: target.status, 
+                            bb: target.bb || '', laborat: target.laborat || '', diagnosa1: target.diagnosa1 || '', diagnosa2: target.diagnosa2 || '', diagnosa3: target.diagnosa3 || '', resep: target.resep || '', status: target.status, 
                             tglKontrol: target.tglKontrol || '', statusKontrol: target.statusKontrol || '-'
                         };
                         
@@ -1964,7 +2141,7 @@
                         if (error) throw error;
                         if(logRiwayat) await supabaseClient.from('riwayat').insert(logRiwayat);
                     } catch(err) {
-                        showToast('Gagal server: '+err.message,'error');
+                        showToast('Gagal sinkron server (Pastikan kolom DB sudah update): '+err.message, 'warning');
                     }
                 }
             }
@@ -2223,6 +2400,113 @@
             fd.forEach((r, i) => { const tag = parseFloat(r.tagihan) || 0; tot += tag; tb.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-3 text-center">${i+1}</td><td class="p-3">${new Date(r.tanggalSistem).toLocaleDateString('id-ID')} ${r.waktuMedisSelesai}</td><td class="p-3 font-mono">${r.erm}</td><td class="p-3 font-bold uppercase">${r.nama}</td><td class="p-3 text-right text-emerald-600 font-bold">${fmt.format(tag)}</td></tr>`; });
             tf.innerHTML = `<tr><td colspan="4" class="p-3 text-right uppercase">Total:</td><td class="p-3 text-right text-lg md:text-xl">${fmt.format(tot)}</td></tr>`;
         }
+
+        function renderLaporanPenyakit() {
+            const fd = filterDataByDate(pelayananData.filter(p => p.status === 'selesai_kasir' || p.status === 'antrean_kasir'), 'penyakit_start', 'penyakit_end'); 
+            
+            const diagCount = {};
+            fd.forEach(r => {
+                const addCount = (diag) => {
+                    if (!diag) return;
+                    const d = diag.trim().toUpperCase();
+                    if (!d) return;
+                    if (!diagCount[d]) diagCount[d] = { L: 0, P: 0, T: 0 };
+                    diagCount[d].T++;
+                    if (r.jk === 'Laki-laki') diagCount[d].L++;
+                    else if (r.jk === 'Perempuan') diagCount[d].P++;
+                };
+                addCount(r.diagnosa1);
+                addCount(r.diagnosa2);
+                addCount(r.diagnosa3);
+            });
+            
+            const sortedDiag = Object.entries(diagCount)
+                .sort((a, b) => b[1].T - a[1].T)
+                .slice(0, 10);
+                
+            const tb = document.getElementById('tableBodyLaporanPenyakit'); 
+            const tf = document.getElementById('tfootLaporanPenyakit');
+            if(!tb) return;
+            tb.innerHTML = ''; tf.innerHTML = '';
+            
+            if (sortedDiag.length === 0) { 
+                tb.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400">Data Kosong.</td></tr>`; 
+                return; 
+            }
+            
+            let totalL = 0, totalP = 0, totalT = 0;
+            sortedDiag.forEach(([nama, count], i) => {
+                totalL += count.L; totalP += count.P; totalT += count.T;
+                tb.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50">
+                    <td class="p-3 text-center font-bold text-slate-500"># ${i+1}</td>
+                    <td class="p-3 font-bold text-slate-700">${nama}</td>
+                    <td class="p-3 text-center text-blue-600 font-semibold">${count.L}</td>
+                    <td class="p-3 text-center text-pink-600 font-semibold">${count.P}</td>
+                    <td class="p-3 text-center font-bold text-rose-600">${count.T}</td>
+                </tr>`;
+            });
+            
+            if(tf) {
+                tf.innerHTML = `<tr><td colspan="2" class="p-3 text-right uppercase font-bold">Total dari Top 10:</td><td class="p-3 text-center font-bold text-blue-700">${totalL}</td><td class="p-3 text-center font-bold text-pink-700">${totalP}</td><td class="p-3 text-center text-lg font-bold text-slate-800">${totalT}</td></tr>`;
+            }
+        }
+
+        function renderLaporanKunjunganDiagnosa() {
+            let fd = filterDataByDate(pelayananData.filter(p => p.status === 'selesai_kasir' || p.status === 'antrean_kasir'), 'kunjungan_diag_start', 'kunjungan_diag_end');
+            
+            const searchInput = document.getElementById('kunjungan_diag_search');
+            const query = searchInput ? searchInput.value.trim().toUpperCase() : '';
+            
+            if (query) {
+                fd = fd.filter(r => {
+                    const d1 = (r.diagnosa1 || '').toUpperCase();
+                    const d2 = (r.diagnosa2 || '').toUpperCase();
+                    const d3 = (r.diagnosa3 || '').toUpperCase();
+                    return d1.includes(query) || d2.includes(query) || d3.includes(query);
+                });
+            }
+
+            const tb = document.getElementById('tableBodyLaporanKunjunganDiagnosa'); 
+            if(!tb) return;
+            tb.innerHTML = '';
+            
+            if (fd.length === 0) { 
+                tb.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-slate-400">Data Kosong. Silakan ketik diagnosa di kolom pencarian.</td></tr>`; 
+                return; 
+            }
+            
+            fd.forEach((r, i) => {
+                let thn = "-";
+                const pData = patientsData.find(x => x.erm === r.erm);
+                if(pData && pData.tglLahirRaw) { 
+                    const dDate = new Date(pData.tglLahirRaw); 
+                    thn = new Date().getFullYear() - dDate.getFullYear() + " Thn"; 
+                }
+                
+                let alamatLengkap = r.alamat || '-';
+                if (r.rt && r.rt !== '-' && r.rw && r.rw !== '-') alamatLengkap += ` RT.${r.rt}/RW.${r.rw}`;
+                if (r.kel && r.kel !== '-') alamatLengkap += `, ${r.kel}`;
+
+                let matchedDiags = [];
+                if ((r.diagnosa1||'').toUpperCase().includes(query) || !query) matchedDiags.push(r.diagnosa1);
+                if ((r.diagnosa2||'').toUpperCase().includes(query) || (!query && r.diagnosa2)) matchedDiags.push(r.diagnosa2);
+                if ((r.diagnosa3||'').toUpperCase().includes(query) || (!query && r.diagnosa3)) matchedDiags.push(r.diagnosa3);
+                
+                const jkClass = r.jk === 'Laki-laki' ? 'text-blue-600' : (r.jk === 'Perempuan' ? 'text-pink-600' : 'text-slate-500');
+                const jkDisplay = r.jk === 'Laki-laki' ? 'L' : (r.jk === 'Perempuan' ? 'P' : '-');
+
+                tb.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50">
+                    <td class="p-3 text-center font-bold text-slate-500">${i+1}</td>
+                    <td class="p-3">${new Date(r.tanggalSistem).toLocaleDateString('id-ID')}</td>
+                    <td class="p-3 font-mono text-indigo-600">${r.erm}</td>
+                    <td class="p-3 font-bold uppercase text-slate-800">${r.nama}</td>
+                    <td class="p-3 text-center font-bold ${jkClass}">${jkDisplay}</td>
+                    <td class="p-3 text-center">${thn}</td>
+                    <td class="p-3 text-xs truncate max-w-[200px]" title="${alamatLengkap}">${alamatLengkap}</td>
+                    <td class="p-3 font-semibold text-rose-600 text-xs whitespace-pre-wrap">${matchedDiags.filter(Boolean).join(', ')}</td>
+                </tr>`;
+            });
+        }
         
         function downloadLaporan(t) {
             let fd = [], nm = '', csv = "sep=,\n";
@@ -2238,7 +2522,7 @@
                     let statusTxt = r.status === 'selesai_kasir' ? 'Selesai' : (r.status === 'antrean_kasir' ? 'Kasir' : 'Medis');
                     csv += `${i+1},"${new Date(r.tanggalSistem).toLocaleDateString('id-ID')}","${r.waktuDaftar}","${r.erm}","${r.nama}","${r.jk}","${alamatLengkap}","${statusTxt}"\n`; 
                 });
-            } else {
+            } else if (t === 'keuangan') {
                 fd = filterDataByDate(pelayananData.filter(p=>p.status==='selesai_kasir'), 'keuangan_start', 'keuangan_end'); 
                 nm = `Laporan_Keuangan_ERM_${Date.now()}.csv`; 
                 csv += "No,Tanggal Pembayaran,Waktu Lunas,eRM,Nama Pasien,Nominal Tagihan (Rp)\n"; 
@@ -2248,6 +2532,69 @@
                     csv += `${i+1},"${new Date(r.tanggalSistem).toLocaleDateString('id-ID')}","${r.waktuMedisSelesai}","${r.erm}","${r.nama}",${tag}\n`; 
                 }); 
                 csv += `,,,,TOTAL,${tot}\n`;
+            } else if (t === 'penyakit') {
+                fd = filterDataByDate(pelayananData.filter(p => p.status === 'selesai_kasir' || p.status === 'antrean_kasir'), 'penyakit_start', 'penyakit_end');
+                const diagCount = {};
+                fd.forEach(r => {
+                    const addCount = (diag) => {
+                        if (!diag) return;
+                        const d = diag.trim().toUpperCase();
+                        if (!d) return;
+                        if (!diagCount[d]) diagCount[d] = { L: 0, P: 0, T: 0 };
+                        diagCount[d].T++;
+                        if (r.jk === 'Laki-laki') diagCount[d].L++;
+                        else if (r.jk === 'Perempuan') diagCount[d].P++;
+                    };
+                    addCount(r.diagnosa1);
+                    addCount(r.diagnosa2);
+                    addCount(r.diagnosa3);
+                });
+                const sortedDiag = Object.entries(diagCount).sort((a, b) => b[1].T - a[1].T).slice(0, 10);
+                
+                nm = `Laporan_Top10_Penyakit_${Date.now()}.csv`;
+                csv += "Peringkat,Nama Penyakit / Diagnosa Medis,Laki-laki,Perempuan,Total Kasus\n";
+                let totalL = 0, totalP = 0, totalT = 0;
+                sortedDiag.forEach(([nama, count], i) => {
+                    totalL += count.L; totalP += count.P; totalT += count.T;
+                    csv += `${i+1},"${nama}",${count.L},${count.P},${count.T}\n`;
+                });
+                csv += `,,${totalL},${totalP},${totalT}\n`;
+                if(sortedDiag.length > 0) fd = sortedDiag; // bypass empty array block alert for logic below
+            } else if (t === 'kunjungan_diagnosa') {
+                fd = filterDataByDate(pelayananData.filter(p => p.status === 'selesai_kasir' || p.status === 'antrean_kasir'), 'kunjungan_diag_start', 'kunjungan_diag_end');
+                const searchInput = document.getElementById('kunjungan_diag_search');
+                const query = searchInput ? searchInput.value.trim().toUpperCase() : '';
+                
+                if (query) {
+                    fd = fd.filter(r => {
+                        const d1 = (r.diagnosa1 || '').toUpperCase();
+                        const d2 = (r.diagnosa2 || '').toUpperCase();
+                        const d3 = (r.diagnosa3 || '').toUpperCase();
+                        return d1.includes(query) || d2.includes(query) || d3.includes(query);
+                    });
+                }
+                
+                nm = `Laporan_Kunjungan_Diagnosa_${Date.now()}.csv`;
+                csv += "No,Tanggal,eRM,Nama Pasien,L/P,Usia,Alamat Lengkap,Diagnosa Tercatat\n";
+                fd.forEach((r, i) => {
+                    let thn = "-";
+                    const pData = patientsData.find(x => x.erm === r.erm);
+                    if(pData && pData.tglLahirRaw) { 
+                        const dDate = new Date(pData.tglLahirRaw); 
+                        thn = new Date().getFullYear() - dDate.getFullYear() + " Thn"; 
+                    }
+                    
+                    let alamatLengkap = r.alamat || '-';
+                    if (r.rt && r.rt !== '-' && r.rw && r.rw !== '-') alamatLengkap += ` RT.${r.rt}/RW.${r.rw}`;
+                    if (r.kel && r.kel !== '-') alamatLengkap += `, ${r.kel}`;
+
+                    let matchedDiags = [];
+                    if ((r.diagnosa1||'').toUpperCase().includes(query) || !query) matchedDiags.push(r.diagnosa1);
+                    if ((r.diagnosa2||'').toUpperCase().includes(query) || (!query && r.diagnosa2)) matchedDiags.push(r.diagnosa2);
+                    if ((r.diagnosa3||'').toUpperCase().includes(query) || (!query && r.diagnosa3)) matchedDiags.push(r.diagnosa3);
+                    
+                    csv += `${i+1},"${new Date(r.tanggalSistem).toLocaleDateString('id-ID')}","${r.erm}","${r.nama}","${r.jk === 'Laki-laki' ? 'L' : (r.jk === 'Perempuan' ? 'P' : '-')}","${thn}","${alamatLengkap}","${matchedDiags.filter(Boolean).join(', ')}"\n`;
+                });
             }
             if (fd.length === 0) { showToast('Tidak ada data untuk didownload!', 'warning'); return; }
             
