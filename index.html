@@ -2521,9 +2521,9 @@
                 if (r.kel && r.kel !== '-') alamatLengkap += `, ${r.kel}`;
 
                 let matchedDiags = [];
-                if ((r.diagnosa1||'').toUpperCase().includes(query) || !query) matchedDiags.push(r.diagnosa1);
-                if ((r.diagnosa2||'').toUpperCase().includes(query) || (!query && r.diagnosa2)) matchedDiags.push(r.diagnosa2);
-                if ((r.diagnosa3||'').toUpperCase().includes(query) || (!query && r.diagnosa3)) matchedDiags.push(r.diagnosa3);
+                if (r.diagnosa1 && ((r.diagnosa1).toUpperCase().includes(query) || !query)) matchedDiags.push(r.diagnosa1);
+                if (r.diagnosa2 && ((r.diagnosa2).toUpperCase().includes(query) || !query)) matchedDiags.push(r.diagnosa2);
+                if (r.diagnosa3 && ((r.diagnosa3).toUpperCase().includes(query) || !query)) matchedDiags.push(r.diagnosa3);
                 
                 const jkClass = r.jk === 'Laki-laki' ? 'text-blue-600' : (r.jk === 'Perempuan' ? 'text-pink-600' : 'text-slate-500');
                 const jkDisplay = r.jk === 'Laki-laki' ? 'L' : (r.jk === 'Perempuan' ? 'P' : '-');
@@ -2628,9 +2628,9 @@
                     if (r.kel && r.kel !== '-') alamatLengkap += `, ${r.kel}`;
 
                     let matchedDiags = [];
-                    if ((r.diagnosa1||'').toUpperCase().includes(query) || !query) matchedDiags.push(r.diagnosa1);
-                    if ((r.diagnosa2||'').toUpperCase().includes(query) || (!query && r.diagnosa2)) matchedDiags.push(r.diagnosa2);
-                    if ((r.diagnosa3||'').toUpperCase().includes(query) || (!query && r.diagnosa3)) matchedDiags.push(r.diagnosa3);
+                    if (r.diagnosa1 && ((r.diagnosa1).toUpperCase().includes(query) || !query)) matchedDiags.push(r.diagnosa1);
+                    if (r.diagnosa2 && ((r.diagnosa2).toUpperCase().includes(query) || !query)) matchedDiags.push(r.diagnosa2);
+                    if (r.diagnosa3 && ((r.diagnosa3).toUpperCase().includes(query) || !query)) matchedDiags.push(r.diagnosa3);
                     
                     const safeNama = `"${r.nama.replace(/"/g, '""')}"`;
                     const safeAlamat = `"${alamatLengkap.replace(/"/g, '""')}"`;
