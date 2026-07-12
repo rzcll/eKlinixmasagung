@@ -33,7 +33,7 @@
         .modal-leave { opacity: 1; transform: scale(1) translateY(0); }
         .modal-leave-active { opacity: 0; transform: scale(0.95) translateY(-10px); transition: all 0.2s ease-in; }
         
-        /* Custom Input styling (Efek Cekung / Inset Shadow) */
+        /* Custom Input styling */
         .form-input { 
             border: 1px solid #cbd5e1 !important; 
             border-radius: 0.75rem !important; 
@@ -59,41 +59,54 @@
             cursor: not-allowed;
         }
 
+        /* Khusus Input Username di Login */
+        #login_username {
+            border-width: 2px !important;
+            border-radius: 1rem !important;
+            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1) !important;
+            background-color: rgba(255, 255, 255, 0.8) !important;
+        }
+        #login_username:focus {
+            border-color: #f97316 !important; /* Warna Orange */
+            background-color: #ffffff !important;
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2), inset 0 1px 2px rgba(0,0,0,0.02) !important;
+            transform: translateY(-2px);
+        }
+
         /* Animasi Transisi Halus Login -> App */
         #login-overlay {
-            transition: opacity 0.5s ease-in-out, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.8s ease-in-out, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .login-bg-green {
-            transition: transform 0.9s cubic-bezier(0.77, 0, 0.175, 1);
+            transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .login-card-white {
-            transition: transform 0.9s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.8s ease;
+            transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.8s ease;
         }
         .split-up {
             transform: translateY(-100%) !important;
         }
         .split-down {
-            transform: translateY(100vh) scale(0.85) !important;
+            transform: translateY(100vh) scale(0.9) !important;
             opacity: 0 !important;
         }
         .login-leave {
             opacity: 0 !important;
-            transform: translateY(-30px) scale(0.96) !important;
+            transform: translateY(-20px) scale(0.98) !important;
             pointer-events: none;
         }
         .app-enter {
-            animation: appSlideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: appSlideUpFade 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
         @keyframes appSlideUpFade {
-            0% { opacity: 0; transform: translateY(40px) scale(0.98); }
+            0% { opacity: 0; transform: translateY(40px) scale(0.97); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         /* Efek Interaktif Logo Login (3D Tilt) */
         .logo-login-interactive {
-            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.5s ease;
-            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.18));
-            will-change: transform, filter;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
             cursor: pointer;
             transform-style: preserve-3d;
         }
@@ -116,30 +129,30 @@
     <div id="toast-container" class="fixed top-6 right-6 z-[500] flex flex-col gap-3 pointer-events-none w-[90%] md:w-auto max-w-sm"></div>
 
     <!-- LOGIN OVERLAY -->
-    <div id="login-overlay" class="fixed inset-0 z-[400] bg-slate-50 flex items-center justify-center p-4 transition-opacity duration-500">
+    <div id="login-overlay" class="fixed inset-0 z-[400] bg-slate-50 flex items-center justify-center p-4 transition-opacity duration-700">
         <div id="login-bg-green" class="login-bg-green absolute top-0 left-0 w-full h-[40vh] bg-gradient-brand rounded-b-[3rem] md:rounded-b-[5rem] shadow-lg flex items-center justify-center overflow-hidden">
         </div>
-        <div id="login-card-white" class="login-card-white bg-white/40 backdrop-blur-xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.4)] w-full max-w-sm px-6 py-8 border border-white/50 relative z-10 transform transition-all hover:shadow-[0_25px_50px_rgba(0,0,0,0.5)]">
-            <form onsubmit="handleLogin(event)" class="space-y-6">
+        <div id="login-card-white" class="login-card-white bg-white/60 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-[548px] px-8 md:px-12 py-10 md:py-12 border border-white/60 relative z-10 transform transition-all hover:shadow-[0_25px_60px_rgba(0,0,0,0.4)]">
+            <form onsubmit="handleLogin(event)" class="space-y-7 md:space-y-8">
                 
-                <div class="text-center w-full mb-6 flex justify-center">
-                    <img src="https://github.com/rzcll/eKlinixmasagung/blob/main/logo%20eklinix.png?raw=true" alt="eKlinik Logo" class="h-16 md:h-20 w-auto object-contain logo-login-interactive">
+                <div class="text-center w-full mb-8 md:mb-10 flex justify-center">
+                    <img src="https://github.com/rzcll/eKlinixmasagung/blob/main/logo%20eklinix.png?raw=true" alt="eKlinik Logo" class="h-[41px] md:h-[51px] w-auto object-contain logo-login-interactive">
                 </div>
                 
-                <div class="w-full flex flex-col gap-1.5">
-                    <label class="form-label text-teal-700 text-[11px] uppercase tracking-widest font-extrabold ml-1">Username / ID</label>
+                <div class="w-full flex flex-col gap-2">
+                    <label class="form-label text-teal-800 text-[11px] uppercase tracking-[0.2em] font-extrabold ml-2 opacity-80">Username / ID</label>
                     <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
-                            <i class="fas fa-user-circle text-teal-500/70 text-2xl group-focus-within:text-orange-500 group-focus-within:scale-110 transition-all duration-300"></i>
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none z-20">
+                            <i class="fas fa-user-circle text-teal-600/60 text-2xl group-focus-within:text-orange-500 group-focus-within:scale-110 transition-all duration-500 ease-out"></i>
                         </div>
-                        <input type="text" id="login_username" required class="form-input pl-14 font-extrabold text-slate-700 py-4 text-base shadow-sm" placeholder="username" autocomplete="off">
+                        <input type="text" id="login_username" required class="form-input pl-16 font-extrabold text-slate-700 py-4 md:py-5 text-base md:text-lg" placeholder="Ketik username Anda..." autocomplete="off">
                     </div>
                 </div>
                 
-                <button type="submit" class="w-full py-4 mt-2 bg-gradient-brand text-white rounded-xl font-bold text-base shadow-md hover:shadow-lg hover:shadow-teal-500/40 transform hover:-translate-y-1 active:scale-95 active:shadow-inner transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden border border-teal-500/30">
-                    <span class="relative z-10 tracking-wide">Login</span> 
-                    <i class="fas fa-sign-in-alt relative z-10 group-hover:translate-x-1.5 transition-transform duration-300"></i>
-                    <div class="absolute inset-0 h-full w-full bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
+                <button type="submit" class="w-full py-4 md:py-5 mt-4 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-2xl font-bold text-lg shadow-[0_10px_20px_rgba(13,148,136,0.3)] hover:shadow-[0_15px_30px_rgba(13,148,136,0.5),0_0_25px_rgba(16,185,129,0.4)] transform hover:-translate-y-1.5 hover:scale-[1.02] hover:brightness-110 active:scale-95 active:shadow-inner transition-all duration-500 flex items-center justify-center gap-3 group relative overflow-hidden border border-teal-500/50">
+                    <span class="relative z-10 tracking-wide transition-all duration-300 group-hover:tracking-widest">Masuk Sistem</span> 
+                    <i class="fas fa-arrow-right relative z-10 group-hover:translate-x-3 transition-transform duration-500 ease-out"></i>
+                    <div class="absolute inset-0 h-full w-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out"></div>
                 </button>
             </form>
         </div>
@@ -593,7 +606,7 @@
                                 </li>
                                 <li onclick="switchView('laporan_penyakit')" class="p-2 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center gap-3 group/item">
                                     <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center group-hover/item:bg-rose-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-viruses"></i></div>
-                                    <div><span class="font-bold text-slate-700 group-hover/item:text-rose-700 transition-colors">10 Penyakit Teratas</span><div class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5">Statistik diagnosa</div></div>
+                                    <div><span class="font-bold text-slate-700 group-hover/item:text-rose-700 transition-colors">Laporan Penyakit</span><div class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5">Statistik diagnosa</div></div>
                                 </li>
                             </ul>
                         </div>
@@ -929,8 +942,6 @@
         // --- Efek 3D Tilt Halus Logo Login ---
         document.addEventListener("DOMContentLoaded", () => {
             const loginLogo = document.querySelector('.logo-login-interactive');
-            const loginInput = document.getElementById('login_username');
-
             if (loginLogo) {
                 loginLogo.addEventListener('mousemove', e => {
                     const rect = loginLogo.getBoundingClientRect();
@@ -940,30 +951,23 @@
                     const centerX = rect.width / 2;
                     const centerY = rect.height / 2;
                     
-                    // Kalkulasi sudut putar rotasi 3D (Maksimal 12 derajat)
+                    // Kalkulasi sudut putar rotasi 3D
                     const rotateX = ((centerY - y) / centerY) * 12;
                     const rotateY = ((x - centerX) / centerX) * 12;
                     
-                    // Kalkulasi pergeseran bayangan dinamis
-                    const shadowX = ((centerX - x) / centerX) * 8;
-                    const shadowY = ((centerY - y) / centerY) * 8;
-                    
-                    // Hilangkan transisi selama mouse bergerak agar tracking sempurna
+                    // Hilangkan transisi selama mouse bergerak
                     loginLogo.style.transition = 'none';
                     loginLogo.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.08)`;
-                    loginLogo.style.filter = `drop-shadow(${shadowX}px ${shadowY + 5}px 12px rgba(0, 0, 0, 0.25))`;
                 });
 
                 loginLogo.addEventListener('mouseleave', () => {
-                    // Kembalikan transisi CSS untuk animasi balik yang sangat halus
-                    loginLogo.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 0.6s ease';
+                    // Kembalikan transisi CSS
+                    loginLogo.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
                     loginLogo.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
-                    loginLogo.style.filter = 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.18))';
                 });
                 
                 loginLogo.addEventListener('mouseenter', () => {
-                    // Transisi masuk saat pertama mouse sentuh
-                    loginLogo.style.transition = 'transform 0.2s ease-out, filter 0.2s ease';
+                    loginLogo.style.transition = 'transform 0.2s ease-out';
                 });
             }
         });
@@ -973,8 +977,10 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbnNoamxodXdxYWJqbXN1Z3VuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1OTQ5MjIsImV4cCI6MjA5OTE3MDkyMn0.lL8xU8EwbOWePfpvAGyz7PutCN9v6ixb0SxlpKQbiLQ';
         
         let supabaseClient = null;
-        if (SUPABASE_URL !== 'URL_SUPABASE_ANDA' && SUPABASE_KEY !== 'KEY_SUPABASE_ANDA') {
+        if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'URL_SUPABASE_ANDA' && SUPABASE_KEY !== 'KEY_SUPABASE_ANDA') {
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } else {
+            console.warn("Supabase tidak berhasil dimuat, beralih ke Mode Lokal.");
         }
 
         // --- Sistem Toast Notifikasi ---
@@ -1161,7 +1167,7 @@
             localStorage.removeItem('erm_username');
             localStorage.removeItem('erm_user_role');
             
-            const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'jadwal-kontrol', 'laporan-kunjungan', 'laporan-keuangan', 'laporan-penyakit', 'laporan-kunjungan-diagnosa', 'pengaturan'];
+            const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'jadwal-kontrol', 'laporan-kunjungan', 'laporan-keuangan', 'laporan-penyakit', 'pengaturan'];
             viewsList.forEach(v => {
                 const el = document.getElementById(`view-${v}`);
                 if(el) {
@@ -1182,12 +1188,12 @@
         // --- STREAMING_CHUNK:Configuring App Navigation & View Controller ---
         // --- Logika Akses / Pindah View ---
         function switchView(view) {
-            if (currentUserRole !== 'admin' && currentUserId !== 'admin' && (view === 'laporan_kunjungan' || view === 'laporan_keuangan' || view === 'laporan_penyakit' || view === 'laporan_kunjungan_diagnosa' || view === 'pengaturan')) {
+            if (currentUserRole !== 'admin' && currentUserId !== 'admin' && (view === 'laporan_kunjungan' || view === 'laporan_keuangan' || view === 'laporan_penyakit' || view === 'pengaturan')) {
                 showToast('Akses Ditolak! Hanya Administrator yang dapat membuka menu ini.', 'error');
                 return;
             }
 
-            const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'jadwal-kontrol', 'laporan-kunjungan', 'laporan-keuangan', 'laporan-penyakit', 'laporan-kunjungan-diagnosa', 'pengaturan'];
+            const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'jadwal-kontrol', 'laporan-kunjungan', 'laporan-keuangan', 'laporan-penyakit', 'pengaturan'];
             
             viewsList.forEach(v => {
                 const el = document.getElementById(`view-${v}`);
@@ -1468,7 +1474,6 @@
                     renderLaporanKunjungan();
                     renderLaporanKeuangan();
                     renderLaporanPenyakit();
-                    renderLaporanKunjunganDiagnosa();
                     updateBadges();
 
                 } catch(err) {
@@ -1491,7 +1496,6 @@
                     renderLaporanKunjungan();
                     renderLaporanKeuangan();
                     renderLaporanPenyakit();
-                    renderLaporanKunjunganDiagnosa();
                     updateBadges();
                 }, 500);
             }
@@ -1844,7 +1848,6 @@
                     renderLaporanKunjungan();
                     renderLaporanKeuangan();
                     renderLaporanPenyakit();
-                    renderLaporanKunjunganDiagnosa();
 
                     fetchDataDariSpreadsheet(); 
                 } catch(err) {
@@ -1878,7 +1881,6 @@
                     renderLaporanKunjungan();
                     renderLaporanKeuangan();
                     renderLaporanPenyakit();
-                    renderLaporanKunjunganDiagnosa();
 
                     showToast(`Data ${dataObj.nama} tersimpan (Local Mode)!`, 'success');
                     tutupFormBaru(); 
@@ -2477,7 +2479,7 @@
                 addCount(r.diagnosa3);
             });
             
-            // Hapus .slice(0, 10) untuk menampilkan semua data diagnosa yang ada
+            // Tampilkan semua data diagnosa yang ada
             const sortedDiag = Object.entries(diagCount).sort((a, b) => b[1].T - a[1].T);
                 
             const tb = document.getElementById('tableBodyLaporanPenyakit'); 
