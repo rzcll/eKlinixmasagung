@@ -112,7 +112,7 @@
 </head>
 <body class="text-sm bg-slate-50 flex flex-col h-screen h-[100dvh] overflow-hidden w-full">
 
-    <!-- Datalist untuk Sugesti Diagnosa -->
+    <!-- DATALIST UNTUK AUTOCOMPLETE DIAGNOSA -->
     <datalist id="listDiagnosa"></datalist>
 
     <!-- TOAST NOTIFICATION -->
@@ -383,11 +383,12 @@
                                 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex-1 flex flex-col">
                                     <label class="form-label text-sm md:text-base mb-2"><i class="fas fa-diagnoses text-indigo-500 mr-2"></i>Diagnosa Medis / ICD-10 <span class="text-rose-500">*</span></label>
                                     <div class="space-y-2 flex-1">
+                                        <!-- LIST DIAGNOSA AUTOCOMPLETE -->
                                         <input type="text" id="pel_diagnosa1" list="listDiagnosa" required class="form-input text-sm font-bold text-indigo-700" placeholder="1. Diagnosa Utama..." autocomplete="off">
                                         <input type="text" id="pel_diagnosa2" list="listDiagnosa" class="form-input text-sm text-slate-700" placeholder="2. Diagnosa Sekunder (Opsional)..." autocomplete="off">
                                         <input type="text" id="pel_diagnosa3" list="listDiagnosa" class="form-input text-sm text-slate-700" placeholder="3. Diagnosa Tambahan (Opsional)..." autocomplete="off">
                                     </div>
-                                    <p class="text-[10px] text-slate-400 mt-2"><i class="fas fa-info-circle"></i> Diagnosa baru otomatis tersimpan sbg sugesti berikutnya.</p>
+                                    <p class="text-[10px] text-slate-400 mt-2"><i class="fas fa-info-circle"></i> Diagnosa otomatis tersimpan sbg dropdown berikutnya.</p>
                                 </div>
                             </div>
                             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col h-full min-h-[200px]">
@@ -807,6 +808,7 @@
             </div>
         </div>
 
+        <!-- LAPORAN PENYAKIT -->
         <div id="view-laporan-penyakit" class="bg-white border border-slate-200 rounded-xl md:rounded-2xl shadow-sm hidden flex-col h-full overflow-hidden transition-all duration-300 w-full">
             <div class="shrink-0 bg-rose-50 border-b border-rose-100 px-4 md:px-6 py-3 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
                 <h1 class="text-lg md:text-xl font-bold text-rose-800 flex items-center gap-3 shrink-0"><div class="w-8 h-8 bg-white text-rose-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-viruses"></i></div>10 Penyakit Terbanyak</h1>
@@ -835,10 +837,12 @@
             </div>
         </div>
 
+        <!-- LAPORAN KUNJUNGAN DIAGNOSA -->
         <div id="view-laporan-kunjungan-diagnosa" class="bg-white border border-slate-200 rounded-xl md:rounded-2xl shadow-sm hidden flex-col h-full overflow-hidden transition-all duration-300 w-full">
             <div class="shrink-0 bg-indigo-50 border-b border-indigo-100 px-4 md:px-6 py-3 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
                 <h1 class="text-lg md:text-xl font-bold text-indigo-800 flex items-center gap-3 shrink-0"><div class="w-8 h-8 bg-white text-indigo-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-notes-medical"></i></div>Kunjungan Diagnosa</h1>
                 <div class="flex flex-wrap sm:flex-nowrap gap-2 items-center w-full lg:w-auto">
+                    <!-- KOLOM SEARCH DIAGNOSA MENGGUNAKAN DATALIST -->
                     <div class="relative w-full sm:w-48 lg:w-64">
                         <i class="fas fa-search absolute left-3 top-2 text-indigo-400 text-sm z-10"></i>
                         <input type="text" id="kunjungan_diag_search" list="listDiagnosa" oninput="renderLaporanKunjunganDiagnosa()" placeholder="Ketik Diagnosa..." class="form-input pl-9 text-xs py-1.5 shadow-sm border-indigo-200 focus:border-indigo-500 bg-white" autocomplete="off">
@@ -1524,38 +1528,50 @@
             }, 1000);
         }
 
-        // --- Logika Autocomplete / Dropdown Diagnosa ---
+        // --- Logika Autocomplete / Dropdown Diagnosa yang Kuat ---
+        function renderDatalist() {
+            const dl = document.getElementById('listDiagnosa');
+            if(!dl) return;
+            dl.innerHTML = '';
+            
+            // Susun secara alfabetis agar lebih mudah dicari
+            Array.from(setDiagnosaMaster).sort().forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                dl.appendChild(opt);
+            });
+        }
+
         function tambahKeDatalist(diag) {
             if (!diag || diag.trim() === '') return;
             const cleanDiag = diag.trim().toUpperCase();
             if (!setDiagnosaMaster.has(cleanDiag)) {
                 setDiagnosaMaster.add(cleanDiag);
-                const dl = document.getElementById('listDiagnosa');
-                if(dl) dl.innerHTML += `<option value="${cleanDiag}">`;
-                // Simpan ke localStorage agar awet 
                 localStorage.setItem('erm_master_diagnosa', JSON.stringify(Array.from(setDiagnosaMaster)));
+                renderDatalist();
             }
         }
 
         function loadMasterDiagnosa() {
-            // Load dari local storage jika ada
+            // 1. Ambil dari LocalStorage
             const saved = localStorage.getItem('erm_master_diagnosa');
             if (saved) {
                 try {
                     const arr = JSON.parse(saved);
-                    arr.forEach(d => {
-                        setDiagnosaMaster.add(d);
-                        const dl = document.getElementById('listDiagnosa');
-                        if(dl) dl.innerHTML += `<option value="${d}">`;
-                    });
+                    arr.forEach(d => setDiagnosaMaster.add(d));
                 } catch(e){}
             }
-            // Tambahkan juga history riwayat database (agar sinkron otomatis)
+            
+            // 2. Ambil dari seluruh riwayat data agar tersinkronisasi 100%
             riwayatMedisGlobal.forEach(r => {
-                tambahKeDatalist(r.diagnosa1);
-                tambahKeDatalist(r.diagnosa2);
-                tambahKeDatalist(r.diagnosa3);
+                if (r.diagnosa1) setDiagnosaMaster.add(r.diagnosa1.trim().toUpperCase());
+                if (r.diagnosa2) setDiagnosaMaster.add(r.diagnosa2.trim().toUpperCase());
+                if (r.diagnosa3) setDiagnosaMaster.add(r.diagnosa3.trim().toUpperCase());
             });
+            
+            // Simpan kembali & Render list
+            localStorage.setItem('erm_master_diagnosa', JSON.stringify(Array.from(setDiagnosaMaster)));
+            renderDatalist();
         }
 
         async function fetchDataDariSpreadsheet() {
