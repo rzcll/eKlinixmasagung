@@ -595,10 +595,6 @@
                                     <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center group-hover/item:bg-rose-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-viruses"></i></div>
                                     <div><span class="font-bold text-slate-700 group-hover/item:text-rose-700 transition-colors">10 Penyakit Teratas</span><div class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5">Statistik diagnosa</div></div>
                                 </li>
-                                <li onclick="switchView('laporan_kunjungan_diagnosa')" class="p-2 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center gap-3 group/item">
-                                    <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover/item:bg-indigo-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-notes-medical"></i></div>
-                                    <div><span class="font-bold text-slate-700 group-hover/item:text-indigo-700 transition-colors">Kunjungan Diagnosa</span><div class="text-[9px] text-slate-400 font-medium leading-tight mt-0.5">Daftar pasien per diagnosa</div></div>
-                                </li>
                             </ul>
                         </div>
                     </li>
@@ -838,40 +834,6 @@
                     </thead>
                     <tbody id="tableBodyLaporanPenyakit" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody>
                     <tfoot id="tfootLaporanPenyakit" class="bg-rose-50 font-bold text-rose-800 text-sm sticky bottom-0 border-t border-rose-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]"></tfoot>
-                </table>
-            </div>
-        </div>
-
-        <!-- LAPORAN KUNJUNGAN DIAGNOSA -->
-        <div id="view-laporan-kunjungan-diagnosa" class="bg-white border border-slate-200 rounded-xl md:rounded-2xl shadow-sm hidden flex-col h-full overflow-hidden transition-all duration-300 w-full">
-            <div class="shrink-0 bg-indigo-50 border-b border-indigo-100 px-4 md:px-6 py-3 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
-                <h1 class="text-lg md:text-xl font-bold text-indigo-800 flex items-center gap-3 shrink-0"><div class="w-8 h-8 bg-white text-indigo-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-notes-medical"></i></div>Kunjungan Diagnosa</h1>
-                <div class="flex flex-wrap sm:flex-nowrap gap-2 items-center w-full lg:w-auto">
-                    <!-- KOLOM SEARCH DIAGNOSA MENGGUNAKAN AUTOCOMPLETE KUSTOM -->
-                    <div class="relative w-full sm:w-48 lg:w-64">
-                        <i class="fas fa-search absolute left-3 top-2.5 text-indigo-400 text-sm z-[15]"></i>
-                        <input type="text" id="kunjungan_diag_search" oninput="renderLaporanKunjunganDiagnosa()" placeholder="Ketik Diagnosa..." class="form-input pl-9 text-xs py-1.5 shadow-sm border-indigo-200 focus:border-indigo-500 bg-white relative z-10" autocomplete="off">
-                        <ul id="dd_kunjungan_diag_search" class="absolute z-50 w-full bg-white border border-indigo-100 shadow-2xl rounded-xl mt-1 max-h-48 overflow-y-auto hidden divide-y divide-slate-50"></ul>
-                    </div>
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 bg-white border border-indigo-200 p-1 rounded-lg shadow-sm w-full sm:w-auto">
-                        <div class="flex items-center w-full sm:w-auto">
-                            <label class="text-[10px] font-bold text-slate-500 pl-2 w-12 sm:w-auto">Mulai:</label>
-                            <input type="date" id="kunjungan_diag_start" class="form-input text-xs py-1 border-none focus:ring-0 bg-transparent w-full sm:w-auto shadow-none" style="box-shadow:none !important;" onchange="renderLaporanKunjunganDiagnosa()">
-                        </div>
-                        <div class="flex items-center w-full sm:w-auto sm:border-l border-indigo-100 sm:pl-2">
-                            <label class="text-[10px] font-bold text-slate-500 pl-2 sm:pl-0 w-12 sm:w-auto">Sampai:</label>
-                            <input type="date" id="kunjungan_diag_end" class="form-input text-xs py-1 border-none focus:ring-0 bg-transparent w-full sm:w-auto shadow-none" style="box-shadow:none !important;" onchange="renderLaporanKunjunganDiagnosa()">
-                        </div>
-                    </div>
-                    <button onclick="downloadLaporan('kunjungan_diagnosa')" class="w-full sm:w-auto bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-indigo-700 flex items-center justify-center gap-2"><i class="fas fa-file-excel"></i> Export CSV</button>
-                </div>
-            </div>
-            <div class="flex-1 overflow-auto bg-white relative">
-                <table class="w-full text-left whitespace-nowrap min-w-[900px]">
-                    <thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-100 sticky top-0 z-10 shadow-sm border-b border-slate-200">
-                        <tr><th class="p-3 text-center w-10">#</th><th class="p-3">Waktu</th><th class="p-3">eRM</th><th class="p-3">Nama Pasien</th><th class="p-3 text-center">L/P</th><th class="p-3 text-center">Usia</th><th class="p-3">Alamat Lengkap</th><th class="p-3">Diagnosa</th></tr>
-                    </thead>
-                    <tbody id="tableBodyLaporanKunjunganDiagnosa" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody>
                 </table>
             </div>
         </div>
@@ -1270,7 +1232,6 @@
             if (view === 'laporan_kunjungan') renderLaporanKunjungan();
             if (view === 'laporan_keuangan') renderLaporanKeuangan();
             if (view === 'laporan_penyakit') renderLaporanPenyakit();
-            if (view === 'laporan_kunjungan_diagnosa') renderLaporanKunjunganDiagnosa();
             if (view === 'pengaturan') fetchPetugasKePengaturan();
         }
 
@@ -1610,7 +1571,6 @@
             setupAutocomplete('pel_diagnosa1', 'dd_pel_diagnosa1');
             setupAutocomplete('pel_diagnosa2', 'dd_pel_diagnosa2');
             setupAutocomplete('pel_diagnosa3', 'dd_pel_diagnosa3');
-            setupAutocomplete('kunjungan_diag_search', 'dd_kunjungan_diag_search', renderLaporanKunjunganDiagnosa);
         }
 
         async function fetchDataDariSpreadsheet() {
