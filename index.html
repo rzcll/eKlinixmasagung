@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Informasi Klinik - eKlinik</title>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
@@ -174,6 +175,7 @@
             <div class="flex-1 overflow-y-auto bg-slate-50/50">
                 <form id="formPasienBaru" onsubmit="simpanDataBaru(event)" class="p-3 sm:p-4 md:p-6 flex flex-col min-h-full">
                     <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-6">
+                        <!-- Informasi Pribadi -->
                         <div class="space-y-4 bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 border-b border-slate-100 pb-2">Informasi Pribadi</h3>
                             <div>
@@ -208,6 +210,7 @@
                             </div>
                         </div>
 
+                        <!-- Detail Kelahiran & Domisili -->
                         <div class="space-y-4 bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 border-b border-slate-100 pb-2">Detail Kelahiran & Domisili</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -324,6 +327,25 @@
             <div class="flex justify-center gap-2 md:gap-3 w-full shrink-0">
                 <button onclick="tutupKonfirmasi()" class="px-4 py-2 md:py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition w-1/2 text-sm">Batal</button>
                 <button onclick="prosesPelayanan()" class="px-4 py-2 md:py-2.5 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl font-semibold hover:shadow-lg transition transform hover:-translate-y-0.5 w-1/2 text-sm">Proses</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL BATAL ANTREAN -->
+    <div id="modalBatalAntrean" class="fixed inset-0 bg-slate-900/60 z-[170] hidden flex justify-center items-center backdrop-blur-sm px-4">
+        <div id="modalBatalAntreanContent" class="bg-white rounded-2xl shadow-2xl p-5 md:p-8 w-full max-w-[420px] modal-enter text-center border border-rose-200 flex flex-col">
+            <div class="mx-auto flex items-center justify-center h-16 w-16 md:h-20 md:w-20 rounded-full bg-rose-50 mb-5 md:mb-6 border-8 border-white shadow-md relative -top-10 md:-top-12">
+                <i class="fas fa-times-circle text-2xl md:text-3xl text-rose-500"></i>
+            </div>
+            <h3 class="text-lg md:text-xl font-extrabold text-slate-800 mb-2 -mt-6 md:-mt-8">Batal Antrean Medis</h3>
+            <p class="text-xs md:text-sm text-slate-500 mb-4 leading-relaxed">Anda akan membatalkan antrean untuk pasien <br><b id="teksBatalNamaPasien" class="text-slate-700 uppercase"></b>.</p>
+            <div class="bg-rose-50 p-3 md:p-4 rounded-xl border border-rose-100 mb-5 md:mb-6 text-left shadow-inner">
+                <label class="block text-[10px] md:text-xs font-bold text-rose-700 mb-1.5 md:mb-2">Ketik No. eRM (<span id="teksBatalErmPasien" class="font-mono"></span>) untuk konfirmasi:</label>
+                <input type="text" id="inputKonfirmasiBatalErm" class="form-input text-center font-mono font-bold text-rose-600 focus:border-rose-500 uppercase tracking-widest text-xs md:text-sm" placeholder="Ketik eRM di sini..." autocomplete="off">
+            </div>
+            <div class="flex justify-center gap-2 md:gap-3 w-full shrink-0">
+                <button onclick="tutupKonfirmasiBatalAntrean()" class="px-3 md:px-4 py-2.5 md:py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition w-1/2 text-sm">Kembali</button>
+                <button id="btnEksekusiBatalAntrean" onclick="eksekusiBatalAntrean()" class="px-3 md:px-4 py-2.5 md:py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 hover:shadow-lg shadow-sm transition transform hover:scale-105 w-1/2 flex justify-center items-center text-sm"><i class="fas fa-times mr-1 md:mr-2"></i> Batalkan</button>
             </div>
         </div>
     </div>
@@ -535,25 +557,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- MODAL KONFIRMASI BATAL ANTREAN MEDIS -->
-    <div id="modalBatalAntrean" class="fixed inset-0 bg-slate-900/60 z-[170] hidden flex justify-center items-center backdrop-blur-sm px-4">
-        <div id="modalBatalAntreanContent" class="bg-white rounded-2xl shadow-2xl p-5 md:p-8 w-full max-w-[420px] modal-enter text-center border border-rose-200 flex flex-col">
-            <div class="mx-auto flex items-center justify-center h-16 w-16 md:h-20 md:w-20 rounded-full bg-rose-50 mb-5 md:mb-6 border-8 border-white shadow-md relative -top-10 md:-top-12">
-                <i class="fas fa-times-circle text-2xl md:text-3xl text-rose-500"></i>
-            </div>
-            <h3 class="text-lg md:text-xl font-extrabold text-slate-800 mb-2 -mt-6 md:-mt-8">Batal Berobat</h3>
-            <p class="text-xs md:text-sm text-slate-500 mb-4 leading-relaxed">Anda akan menghapus <br><b id="teksBatalNamaPasien" class="text-slate-700 uppercase"></b> dari antrean medis.</p>
-            <div class="bg-rose-50 p-3 md:p-4 rounded-xl border border-rose-100 mb-5 md:mb-6 text-left shadow-inner">
-                <label class="block text-[10px] md:text-xs font-bold text-rose-700 mb-1.5 md:mb-2">Ketik No. eRM (<span id="teksBatalErmPasien" class="font-mono"></span>) untuk konfirmasi:</label>
-                <input type="text" id="inputKonfirmasiBatalErm" class="form-input text-center font-mono font-bold text-rose-600 focus:border-rose-500 uppercase tracking-widest text-xs md:text-sm" placeholder="Ketik eRM di sini..." autocomplete="off">
-            </div>
-            <div class="flex justify-center gap-2 md:gap-3 w-full shrink-0">
-                <button onclick="tutupKonfirmasiBatalAntrean()" class="px-3 md:px-4 py-2.5 md:py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition w-1/2 text-sm">Kembali</button>
-                <button id="btnEksekusiBatalAntrean" onclick="eksekusiBatalAntrean()" class="px-3 md:px-4 py-2.5 md:py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 hover:shadow-lg shadow-sm transition transform hover:scale-105 w-1/2 flex justify-center items-center text-sm"><i class="fas fa-trash-alt mr-1 md:mr-2"></i> Hapus</button>
-            </div>
-        </div>
-    </div>
 
     <!-- NAVBAR PREMIUM -->
     <nav class="shrink-0 bg-gradient-brand text-white shadow-lg z-50 border-b border-teal-800/50">
@@ -731,7 +734,7 @@
                             <th class="p-2 md:p-3">Nama Pasien</th>
                             <th class="p-2 md:p-3 text-center">L/P & Usia</th>
                             <th class="p-2 md:p-3">Waktu Daftar</th>
-                            <th class="p-2 md:p-3 text-center w-36 md:w-44">Pemeriksaan</th>
+                            <th class="p-2 md:p-3 text-center w-36 md:w-48">Pemeriksaan</th>
                         </tr>
                     </thead>
                     <tbody id="tableBodyPelayananMedis" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody>
@@ -961,8 +964,6 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
 
     <script>
-        // --- STREAMING_CHUNK:Initializing Application Settings & Logic ---
-        
         // --- Efek 3D Tilt Halus Logo Login ---
         document.addEventListener("DOMContentLoaded", () => {
             const loginLogo = document.querySelector('.logo-login-interactive');
@@ -1028,6 +1029,7 @@
             setTimeout(() => { toast.classList.remove('toast-enter-active'); toast.classList.add('toast-leave-active'); setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
+        // --- STREAMING_CHUNK:Configuring State & Global Variables ---
         // --- State ---
         let patientsData = []; 
         let pelayananData = []; 
@@ -1045,7 +1047,6 @@
             strukFooter: 'Terima Kasih, Semoga Lekas Sembuh'
         };
 
-        // --- STREAMING_CHUNK:Configuring User Authentication ---
         // --- Sistem Autentikasi / Login ---
         let currentUserId = localStorage.getItem('erm_user_id') || '';
         let currentUsername = localStorage.getItem('erm_username') || '';
@@ -1209,7 +1210,7 @@
             checkAuth();
         }
 
-        // --- STREAMING_CHUNK:Configuring App Navigation & View Controller ---
+        // --- STREAMING_CHUNK:Building the Tab Navigation Logic ---
         // --- Logika Akses / Pindah View ---
         function switchView(view) {
             if (currentUserRole !== 'admin' && currentUserId !== 'admin' && (view === 'laporan_kunjungan' || view === 'laporan_keuangan' || view === 'laporan_penyakit' || view === 'pengaturan')) {
@@ -1272,7 +1273,6 @@
             if (view === 'pengaturan') fetchPetugasKePengaturan();
         }
 
-        // --- STREAMING_CHUNK:Implementing Database Maintenance & Officers Control ---
         // --- Logika Manajemen Petugas & Pengaturan ---
         async function fetchPetugasKePengaturan() {
             if (supabaseClient) {
@@ -1287,6 +1287,7 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Setting up Settings Features ---
         function renderTabelPetugas() {
             const tb = document.getElementById('tablePetugasList');
             if(!tb) return;
@@ -1443,6 +1444,7 @@
             }, 1000);
         }
 
+        // --- STREAMING_CHUNK:Building Patient Deletion Feature ---
         let pasienTargetDelete = null;
 
         function bukaKonfirmasiHapusPasien(erm, nama) {
@@ -1530,75 +1532,7 @@
             }, 1000);
         }
 
-        // --- Logika Batal Berobat / Antrean ---
-        let antreanTargetDelete = null;
-
-        function bukaKonfirmasiBatalAntrean(erm, nama, waktuDaftar) {
-            antreanTargetDelete = { erm, nama, waktuDaftar };
-            document.getElementById('teksBatalNamaPasien').textContent = nama;
-            document.getElementById('teksBatalErmPasien').textContent = erm;
-            document.getElementById('inputKonfirmasiBatalErm').value = '';
-            tampilModal('modalBatalAntrean', 'modalBatalAntreanContent');
-        }
-
-        function tutupKonfirmasiBatalAntrean() {
-            sembunyikanModal('modalBatalAntrean', 'modalBatalAntreanContent');
-            antreanTargetDelete = null;
-        }
-
-        async function eksekusiBatalAntrean() {
-            if (!antreanTargetDelete) return;
-
-            const inputErm = document.getElementById('inputKonfirmasiBatalErm').value.trim().toUpperCase();
-            if (inputErm !== antreanTargetDelete.erm) {
-                showToast('Nomor eRM tidak cocok! Pembatalan digagalkan.', 'error');
-                return;
-            }
-
-            const btn = document.getElementById('btnEksekusiBatalAntrean');
-            const oriText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Proses...';
-            btn.disabled = true;
-
-            const targetErm = antreanTargetDelete.erm;
-            const targetWaktu = antreanTargetDelete.waktuDaftar;
-
-            if (supabaseClient) {
-                try {
-                    const { error } = await supabaseClient.from('pelayanan').delete().match({ erm: targetErm, waktuDaftar: targetWaktu });
-                    if (error) throw error;
-
-                    pelayananData = pelayananData.filter(p => !(p.erm === targetErm && p.waktuDaftar === targetWaktu));
-
-                    showToast(`Antrean medis ${antreanTargetDelete.nama} berhasil dibatalkan.`, 'success');
-                    tutupKonfirmasiBatalAntrean();
-
-                    renderTabelPelayananMedis();
-                    updateBadges();
-                    if(kalenderMedisInstance) kalenderMedisInstance.redraw();
-
-                } catch(err) {
-                    showToast('Gagal membatalkan antrean: ' + err.message, 'error');
-                }
-            } else {
-                setTimeout(() => {
-                    pelayananData = pelayananData.filter(p => !(p.erm === targetErm && p.waktuDaftar === targetWaktu));
-
-                    showToast(`Antrean medis ${antreanTargetDelete.nama} dibatalkan (Local).`, 'success');
-                    tutupKonfirmasiBatalAntrean();
-
-                    renderTabelPelayananMedis();
-                    updateBadges();
-                    if(kalenderMedisInstance) kalenderMedisInstance.redraw();
-                }, 500);
-            }
-
-            setTimeout(() => {
-                btn.innerHTML = oriText;
-                btn.disabled = false;
-            }, 1000);
-        }
-
+        // --- STREAMING_CHUNK:Autocompletion for Diagnosis ---
         // --- Logika Autocomplete / Dropdown Diagnosa Kustom (Tampilan Menarik) ---
         function setupAutocomplete(inputId, dropdownId, onSelectCallback = null) {
             const input = document.getElementById(inputId);
@@ -1756,7 +1690,7 @@
             showToast('Template Struk berhasil diperbarui!', 'success');
         }
 
-        // --- STREAMING_CHUNK:Setting up Components, Forms & Calendars ---
+        // --- STREAMING_CHUNK:Configuring Date Calculations ---
         function initTanggal() {
             if (!fpTglLahir) {
                 fpTglLahir = flatpickr("#form_tgl_lahir", {
@@ -1895,8 +1829,7 @@
                 alamat: document.getElementById('form_alamat').value || '-',
                 rt: document.getElementById('form_rt').value || '-',
                 rw: document.getElementById('form_rw').value || '-',
-                tag: editPasienIndex === -1 ? 'Baru' : patientsData[editPasienIndex].tag,
-                created_at: editPasienIndex === -1 ? new Date().toISOString() : (patientsData[editPasienIndex].created_at || "2000-01-01T00:00:00.000Z")
+                tag: editPasienIndex === -1 ? 'Baru' : patientsData[editPasienIndex].tag
             };
             
             let tglFormatted = dataObj.tglLahirRaw ? dataObj.tglLahirRaw.split('-').reverse().join('-') : '';
@@ -1910,7 +1843,7 @@
                     const { error } = await supabaseClient.from('pasien').upsert(dataObj, { onConflict: 'erm' });
                     if (error) throw error;
                     
-                    // NEW: Memastikan Database Pelayanan juga ikut terganti namanya agar sinkron
+                    // Memastikan Database Pelayanan juga ikut terganti namanya agar sinkron
                     await supabaseClient.from('pelayanan').update({ nama: dataObj.nama }).eq('erm', dataObj.erm);
 
                     showToast(`Data ${dataObj.nama} berhasil disimpan ke Server!`, 'success');
@@ -1982,6 +1915,7 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Rendering Master Patient Table ---
         function renderTabel(data) {
             const tb = document.getElementById('tableBody'); 
             if(!tb) return;
@@ -2000,16 +1934,19 @@
             filteredData.forEach((row, index) => {
                 const tr = document.createElement('tr'); tr.className = "hover:bg-teal-50/30 transition-colors";
                 
-                let isBaru = false;
-                if (row.created_at) {
-                    const diffHours = (new Date() - new Date(row.created_at)) / (1000 * 60 * 60);
-                    if (diffHours <= 24) isBaru = true;
-                } else if (row.tag === 'Baru') {
-                    isBaru = true; // Fallback untuk data yang belum memiliki created_at
-                }
+                // --- LOGIKA HITUNG KUNJUNGAN UNTUK LABEL "BARU" ---
+                // Menghitung jumlah riwayat pendaftaran/kunjungan dari tabel pelayanan & riwayat medis
+                const hitungPelayanan = pelayananData.filter(p => p.erm === row.erm).length;
+                const hitungRiwayat = riwayatMedisGlobal.filter(p => p.erm === row.erm).length;
+                const totalKunjungan = Math.max(hitungPelayanan, hitungRiwayat);
 
                 let nm = `<span class="font-bold text-slate-700">${row.nama}</span>`;
-                if(isBaru) nm += `<span class="ml-2 bg-teal-100 text-teal-700 text-[8px] md:text-[10px] px-1.5 md:px-2 py-0.5 rounded-md font-bold uppercase tracking-wider border border-teal-200">Baru</span>`;
+                
+                // Jika total kunjungan kurang dari 2 (kunjungan pertama/ke-1), label BARU muncul.
+                // Jika kunjungan ke-2 (2 kali periksa) atau lebih, otomatis hilang.
+                if(totalKunjungan < 2) {
+                    nm += `<span class="ml-2 bg-teal-100 text-teal-700 text-[8px] md:text-[10px] px-1.5 md:px-2 py-0.5 rounded-md font-bold uppercase tracking-wider border border-teal-200">Baru</span>`;
+                }
                 
                 let thn = "0";
                 if(row.tglLahirRaw) { 
@@ -2046,7 +1983,7 @@
             });
         }
 
-        // --- STREAMING_CHUNK:Implementing Workflows for Medis & Kasir ---
+        // --- STREAMING_CHUNK:Building Medical Encounter Workflow ---
         function bukaRiwayatLengkap(erm) {
             const p = patientsData.find(x => x.erm === erm); if(!p) return;
             document.getElementById('riwayatNama').textContent = p.nama; document.getElementById('riwayatErm').textContent = p.erm;
@@ -2112,6 +2049,10 @@
                 };
                 
                 pelayananData.push(newAntrean);
+                
+                // Memicu re-render agar hitungan > 2 (Kunjungan) di master pasien bekerja seketika (UX Halus)
+                renderTabel(patientsData);
+                
                 updateBadges(); 
                 if(kalenderMedisInstance) kalenderMedisInstance.redraw();
                 showToast(`Kirim ke Poli Medis Berhasil!`, 'success'); 
@@ -2142,6 +2083,77 @@
             }
         }
 
+        // --- Logika Fitur Batal Antrean Medis ---
+        let antreanTargetBatal = null;
+
+        function bukaKonfirmasiBatalAntrean(erm, nama, waktuDaftar) {
+            antreanTargetBatal = { erm, nama, waktuDaftar };
+            document.getElementById('teksBatalNamaPasien').textContent = nama;
+            document.getElementById('teksBatalErmPasien').textContent = erm;
+            document.getElementById('inputKonfirmasiBatalErm').value = '';
+            tampilModal('modalBatalAntrean', 'modalBatalAntreanContent');
+        }
+
+        function tutupKonfirmasiBatalAntrean() {
+            sembunyikanModal('modalBatalAntrean', 'modalBatalAntreanContent');
+            antreanTargetBatal = null;
+        }
+
+        async function eksekusiBatalAntrean() {
+            if (!antreanTargetBatal) return;
+            
+            const inputErm = document.getElementById('inputKonfirmasiBatalErm').value.trim().toUpperCase();
+            if (inputErm !== antreanTargetBatal.erm) {
+                showToast('Nomor eRM tidak cocok!', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btnEksekusiBatalAntrean');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Proses...';
+            btn.disabled = true;
+
+            const targetErm = antreanTargetBatal.erm;
+            const targetWaktu = antreanTargetBatal.waktuDaftar;
+
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient.from('pelayanan').delete().match({ erm: targetErm, waktuDaftar: targetWaktu });
+                    if (error) throw error;
+                    
+                    pelayananData = pelayananData.filter(p => !(p.erm === targetErm && p.waktuDaftar === targetWaktu));
+                    showToast(`Antrean medis ${antreanTargetBatal.nama} berhasil dibatalkan.`, 'success');
+                    tutupKonfirmasiBatalAntrean();
+                    
+                    // Render UI ulang
+                    renderTabelPelayananMedis(); 
+                    updateBadges(); 
+                    renderTabel(patientsData);
+                    if(kalenderMedisInstance) kalenderMedisInstance.redraw();
+                    
+                } catch(err) {
+                    showToast('Gagal membatalkan antrean: ' + err.message, 'error');
+                }
+            } else {
+                setTimeout(() => {
+                    pelayananData = pelayananData.filter(p => !(p.erm === targetErm && p.waktuDaftar === targetWaktu));
+                    showToast(`Antrean medis ${antreanTargetBatal.nama} dibatalkan (Local Mode).`, 'success');
+                    tutupKonfirmasiBatalAntrean();
+                    
+                    // Render UI ulang
+                    renderTabelPelayananMedis(); 
+                    updateBadges(); 
+                    renderTabel(patientsData);
+                    if(kalenderMedisInstance) kalenderMedisInstance.redraw();
+                }, 500);
+            }
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-times mr-1 md:mr-2"></i> Batalkan';
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        // --- STREAMING_CHUNK:Rendering Medical Queues ---
         function renderTabelPelayananMedis() {
             const tb = document.getElementById('tableBodyPelayananMedis'); 
             if(!tb) return;
@@ -2174,9 +2186,9 @@
                 const tr = document.createElement('tr'); const blm = row.status === 'antrean_medis';
                 tr.className = blm ? "bg-yellow-100 hover:bg-yellow-200 transition-colors" : "bg-green-100 hover:bg-green-200 transition-colors";
                 
+                // --- PENAMBAHAN TOMBOL BATAL ANTREAN MEDIS ---
                 let btn = blm 
-                    ? `<div class="flex gap-1.5"><button onclick="bukaFormPelayanan('${row.erm}')" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-700 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:py-2 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 flex items-center justify-center"><i class="fas fa-stethoscope mr-1 md:mr-2 text-[10px] md:text-sm"></i> Periksa</button>
-                       <button onclick="bukaKonfirmasiBatalAntrean('${row.erm}', '${row.nama.replace(/'/g, "\\'")}', '${row.waktuDaftar}')" class="w-8 md:w-9 bg-gradient-to-r from-rose-400 to-rose-600 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 flex items-center justify-center shrink-0" title="Batal Antrean"><i class="fas fa-times"></i></button></div>`
+                    ? `<div class="flex gap-1 justify-center"><button onclick="bukaKonfirmasiBatalAntrean('${row.erm}', '${row.nama.replace(/'/g, "\\'")}', '${row.waktuDaftar}')" class="bg-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white px-2 py-1.5 md:py-2 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center shrink-0" title="Batal Antrean"><i class="fas fa-times"></i></button><button onclick="bukaFormPelayanan('${row.erm}')" class="bg-gradient-to-r from-blue-500 to-blue-700 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:py-2 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 w-full flex items-center justify-center"><i class="fas fa-stethoscope mr-1 md:mr-2 text-[10px] md:text-sm"></i> Periksa</button></div>`
                     : `<button onclick="bukaFormPelayanan('${row.erm}')" class="bg-gradient-to-r from-emerald-400 to-green-600 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:py-2 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 w-full flex items-center justify-center"><i class="fas fa-edit mr-1 md:mr-2 text-[10px] md:text-sm"></i> Edit Hasil</button>`;
 
                 let thn = "0";
@@ -2197,6 +2209,7 @@
             });
         }
 
+        // --- STREAMING_CHUNK:Finalizing Medical Process & Kasir ---
         let rekamMedisAktif = null;
         function bukaFormPelayanan(erm) {
             rekamMedisAktif = [...pelayananData].reverse().find(p => p.erm === erm); if(!rekamMedisAktif) return;
@@ -2342,6 +2355,7 @@
             });
         }
 
+        // --- STREAMING_CHUNK:Rendering Checkout and Payment ---
         function renderTabelPelayananKasir() {
             const tb = document.getElementById('tableBodyPelayananKasir'); 
             if(!tb) return;
@@ -2492,7 +2506,7 @@
             pw.document.close(); pw.focus(); setTimeout(() => { pw.print(); }, 500);
         }
 
-        // --- STREAMING_CHUNK:Preparing Reporting System ---
+        // --- STREAMING_CHUNK:Building Statistical Reports ---
         function filterDataByDate(arr, startId, endId) {
             return arr.filter(i => { 
                 if(!i.tanggalSistem) return false; 
@@ -2629,6 +2643,7 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Downloading Reports and Final Configurations ---
         function downloadLaporan(t) {
             let fd = [], nm = '', csv = "sep=,\n";
             if (t === 'kunjungan') {
@@ -2804,7 +2819,6 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Starting Application ---
         checkAuth();
     </script>
 </body>
