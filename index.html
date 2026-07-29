@@ -1633,10 +1633,33 @@
         }
 
         function hitungTglLahirDariUmur() {
-            const thn = parseInt(document.getElementById('umur_thn').value) || 0; const bln = parseInt(document.getElementById('umur_bln').value) || 0; const hr = parseInt(document.getElementById('umur_hr').value) || 0;
-            if(thn === 0 && bln === 0 && hr === 0) { if(fpTglLahir) fpTglLahir.clear(false); return; }
-            const hariIni = new Date(); const estTglLahir = new Date(hariIni.getFullYear() - thn, hariIni.getMonth() - bln, hariIni.getDate() - hr);
-            if (fpTglLahir) { fpTglLahir.setDate(estTglLahir, false); }
+            const thn = parseInt(document.getElementById('umur_thn').value) || 0;
+            const bln = parseInt(document.getElementById('umur_bln').value) || 0;
+            const hr = parseInt(document.getElementById('umur_hr').value) || 0;
+
+            // Jika form usia dikosongkan/nol semua, bersihkan input tanggal lahir
+            if(thn === 0 && bln === 0 && hr === 0) { 
+                if(fpTglLahir) fpTglLahir.clear(false); 
+                document.getElementById('form_tgl_lahir').value = '';
+                return; 
+            }
+
+            const hariIni = new Date(); 
+            // Mengurangi tahun saat ini dengan usia yang diinput (Otomatis menyesuaikan tahun lahir)
+            const estTglLahir = new Date(hariIni.getFullYear() - thn, hariIni.getMonth() - bln, hariIni.getDate() - hr);
+            
+            // Format output ke YYYY-MM-DD
+            const yyyy = estTglLahir.getFullYear();
+            const mm = String(estTglLahir.getMonth() + 1).padStart(2, '0');
+            const dd = String(estTglLahir.getDate()).padStart(2, '0');
+            const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+            if (fpTglLahir) { 
+                fpTglLahir.setDate(estTglLahir, false); 
+            }
+            
+            // Paksa penulisan ke form input agar user langsung melihat perubahannya
+            document.getElementById('form_tgl_lahir').value = formattedDate;
         }
 
         function initKalenderMedis() {
