@@ -1220,7 +1220,6 @@
             checkAuth();
         }
 
-        // --- STREAMING_CHUNK:Implementing App Views Logic ---
         function switchView(view) {
             if (currentUserRole !== 'admin' && currentUserId !== 'admin' && (view === 'laporan_kunjungan' || view === 'laporan_keuangan' || view === 'laporan_penyakit' || view === 'pengaturan')) {
                 showToast('Akses Ditolak! Hanya Administrator yang dapat membuka menu ini.', 'error');
@@ -1441,7 +1440,6 @@
             }, 1000);
         }
 
-        // --- STREAMING_CHUNK:Automated Date Calculation Logic ---
         let pasienTargetDelete = null;
         function bukaKonfirmasiHapusPasien(erm, nama) {
             pasienTargetDelete = { erm, nama };
@@ -1624,7 +1622,7 @@
                     currentPagePasien=1; renderTabel(patientsData); 
                 }
             } else {
-                setTimeout(() => { showToast('Mode Lokal. Silakan isi SUPABASE URL & KEY!', 'warning'); loadMasterDiagnosa(); currentPagePasien=1; renderTabel(patientsData); initKalenderMedis();}, 800);
+                setTimeout(() => { showToast('Mode Lokal. Silakan isi SUPABASE URL & KEY!', 'warning'); loadMasterDiagnosa(); currentPagePasien=1; renderTabel(patientsData); initKalenderMedis(); updateBadges(); }, 800);
             }
         }
 
@@ -1700,7 +1698,6 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Pagination Implementations ---
         function initKalenderMedis() {
             const fpInput = document.getElementById("filter_tgl_medis");
             if (!fpInput) return;
@@ -2000,7 +1997,6 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Additional Action Logics ---
         let antreanTargetBatal = null;
         function bukaKonfirmasiBatalAntrean(erm, nama, waktuDaftar) {
             antreanTargetBatal = { erm, nama, waktuDaftar };
@@ -2207,7 +2203,6 @@
             });
         }
 
-        // --- STREAMING_CHUNK:Kasir and Payments ---
         function renderTabelPelayananKasir() {
             const tb = document.getElementById('tableBodyPelayananKasir'); 
             if(!tb) return;
@@ -2347,7 +2342,6 @@
             pw.document.close(); pw.focus(); setTimeout(() => { pw.print(); }, 500);
         }
 
-        // --- STREAMING_CHUNK:Finalizing Reports and Pagination logic ---
         function filterDataByDate(arr, startId, endId) {
             return arr.filter(i => { 
                 if(!i.tanggalSistem) return false; 
@@ -2593,28 +2587,62 @@
             if(j>0){bJ.textContent=j; bJ.classList.remove('hidden');} else bJ.classList.add('hidden');
 
             const bNotif = document.getElementById('badgeNotif'), lNotif = document.getElementById('notifCountLabel'), listNotif = document.getElementById('notifList');
-            if(j > 0) {
-                if(bNotif) { bNotif.textContent = j; bNotif.classList.remove('hidden'); }
-                if(lNotif) { lNotif.textContent = `${j} Baru`; }
+            
+            // --- MODIFIKASI: ARRAY INFORMASI KUSTOM ---
+            // Anda dapat menambah, mengurangi, atau mengubah isi array ini
+            const informasiKustom = [
+                {
+                    icon: 'fa-bullhorn', // Icon fontawesome
+                    bgColor: 'bg-blue-100', // Warna background lingkaran
+                    textColor: 'text-blue-600', // Warna icon
+                    title: 'Aktivasi Akun',
+                    desc: 'Akun aktif sampai 28 Agustus 2026, segera perpanjang aktivasi akun eKlinix.'
+                },
+
+            ];
+
+            const totalNotifikasi = j + informasiKustom.length;
+
+            if(totalNotifikasi > 0) {
+                if(bNotif) { bNotif.textContent = totalNotifikasi; bNotif.classList.remove('hidden'); }
+                if(lNotif) { lNotif.textContent = `${totalNotifikasi} Baru`; }
                 if(listNotif) {
                     listNotif.innerHTML = '';
-                    kontrolHariIni.forEach(p => {
+                    
+                    // 1. Render Informasi Kustom (Statis)
+                    informasiKustom.forEach(info => {
                         listNotif.innerHTML += `
-                            <li class="p-2 md:p-3 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100 cursor-pointer" onclick="switchView('jadwal_kontrol')">
+                            <li class="p-2 md:p-3 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100 cursor-default">
                                 <div class="flex items-start gap-2 md:gap-3">
-                                    <div class="w-6 h-6 md:w-8 md:h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 md:mt-0.5"><i class="fas fa-calendar-day text-[10px] md:text-xs"></i></div>
+                                    <div class="w-6 h-6 md:w-8 md:h-8 rounded-full ${info.bgColor} ${info.textColor} flex items-center justify-center shrink-0 md:mt-0.5"><i class="fas ${info.icon} text-[10px] md:text-xs"></i></div>
                                     <div>
-                                        <p class="text-[11px] md:text-xs text-slate-600 leading-relaxed">Pasien <b class="text-slate-800 uppercase">${p.nama}</b> waktunya untuk kontrol.</p>
-                                        <p class="text-[9px] text-slate-400 mt-0.5 md:mt-1 font-mono">${p.erm}</p>
+                                        <p class="text-[11px] md:text-xs text-slate-800 font-bold uppercase mb-0.5">${info.title}</p>
+                                        <p class="text-[10px] md:text-xs text-slate-600 leading-relaxed">${info.desc}</p>
                                     </div>
                                 </div>
                             </li>`;
                     });
+
+                    // 2. Render Jadwal Kontrol Pasien (Dinamis)
+                    if(j > 0) {
+                        kontrolHariIni.forEach(p => {
+                            listNotif.innerHTML += `
+                                <li class="p-2 md:p-3 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100 cursor-pointer" onclick="switchView('jadwal_kontrol')">
+                                    <div class="flex items-start gap-2 md:gap-3">
+                                        <div class="w-6 h-6 md:w-8 md:h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 md:mt-0.5"><i class="fas fa-calendar-day text-[10px] md:text-xs"></i></div>
+                                        <div>
+                                            <p class="text-[11px] md:text-xs text-slate-600 leading-relaxed">Pasien <b class="text-slate-800 uppercase">${p.nama}</b> waktunya untuk kontrol.</p>
+                                            <p class="text-[9px] text-slate-400 mt-0.5 md:mt-1 font-mono">${p.erm}</p>
+                                        </div>
+                                    </div>
+                                </li>`;
+                        });
+                    }
                 }
             } else {
                 if(bNotif) { bNotif.classList.add('hidden'); }
                 if(lNotif) { lNotif.textContent = `0 Baru`; }
-                if(listNotif) { listNotif.innerHTML = `<li class="p-3 md:p-4 text-center text-slate-400 text-xs">Tidak ada jadwal kontrol tertunda.</li>`; }
+                if(listNotif) { listNotif.innerHTML = `<li class="p-3 md:p-4 text-center text-slate-400 text-xs">Tidak ada notifikasi baru.</li>`; }
             }
         }
 
