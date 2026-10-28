@@ -291,7 +291,7 @@
                             <tr>
                                 <th class="p-3 border-b border-indigo-100 w-28 md:w-32">Tgl Kunjungan</th>
                                 <th class="p-3 border-b border-indigo-100">Anamnesa & Fisik</th>
-                                <th class="p-3 border-b border-indigo-100 w-24">Vital Sign</th>
+                                <th class="p-3 border-b border-indigo-100 w-32 md:w-40">Vital Sign & Lab</th>
                                 <th class="p-3 border-b border-indigo-100 w-56 md:w-64">Diagnosa & Resep</th>
                             </tr>
                         </thead>
@@ -1580,23 +1580,42 @@
             setupAutocomplete('filter_kunjungan_diagnosa', 'dd_filter_kunjungan_diagnosa', () => { currentPageKunjungan=1; renderLaporanKunjungan(); });
         }
 
+        // --- SISTEM PEMBACAAN DATA SUPABASE > 1000 ROWS ---
+        async function fetchAllData(tableName, orderByStr = null, asc = false) {
+            let allData = [];
+            let start = 0;
+            const limit = 1000;
+            while (true) {
+                let q = supabaseClient.from(tableName).select('*').range(start, start + limit - 1);
+                if (orderByStr) {
+                    q = q.order(orderByStr, { ascending: asc });
+                }
+                const { data, error } = await q;
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    allData = allData.concat(data);
+                    if (data.length < limit) break;
+                    start += limit;
+                } else {
+                    break;
+                }
+            }
+            return allData;
+        }
+
         async function fetchDataDariSpreadsheet() {
             const tb = document.getElementById('tableBody');
             if(tb) tb.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-teal-600 font-bold"><i class="fas fa-circle-notch fa-spin mr-2"></i> Sinkronisasi Data Database...</td></tr>`;
             
             if (supabaseClient) {
                 try {
-                    const [resConfig, resPasien, resPelayanan, resRiwayat] = await Promise.all([
-                        supabaseClient.from('pengaturan').select('*'),
-                        supabaseClient.from('pasien').select('*').order('erm', { ascending: false }),
-                        supabaseClient.from('pelayanan').select('*'),
-                        supabaseClient.from('riwayat').select('*')
-                    ]);
-                    
+                    const resConfig = await supabaseClient.from('pengaturan').select('*');
                     if (resConfig.error) throw resConfig.error;
-                    if (resPasien.error) throw resPasien.error;
-                    if (resPelayanan.error) throw resPelayanan.error;
-                    if (resRiwayat.error) throw resRiwayat.error;
+
+                    // Fetch keseluruhan data mem-bypass batas 1000 baris
+                    const allPasien = await fetchAllData('pasien', 'erm', false);
+                    const allPelayanan = await fetchAllData('pelayanan');
+                    const allRiwayat = await fetchAllData('riwayat');
 
                     if (resConfig.data) {
                         resConfig.data.forEach(item => { appConfig[item.key] = item.value; });
@@ -1605,16 +1624,18 @@
                         document.getElementById('set_struk_footer').value = appConfig.strukFooter || 'Terima Kasih';
                     }
                     
-                    if (resPasien.data) patientsData = resPasien.data;
+                    patientsData = allPasien;
                     
-                    if (resPelayanan.data) {
-                        pelayananData = resPelayanan.data.map(p => {
+                    if (allPelayanan) {
+                        pelayananData = allPelayanan.map(p => {
                             const pat = patientsData.find(x => x.erm === p.erm) || {};
                             return { ...p, nama: pat.nama || p.nama, nik: pat.nik || '-', tanggalSistem: new Date(p.tanggalSistem), jk: pat.jk || '-', alamat: pat.alamat || '-', rt: pat.rt || '-', rw: pat.rw || '-', kel: pat.kel || '-', ttl: pat.ttl || '-', no_wa: pat.no_wa || '-', tglKontrol: p.tglKontrol || '', statusKontrol: p.statusKontrol || '-' };
                         });
                     }
                     
-                    if (resRiwayat.data) riwayatMedisGlobal = resRiwayat.data;
+                    if (allRiwayat) {
+                        riwayatMedisGlobal = allRiwayat;
+                    }
                     
                     loadMasterDiagnosa();
                     
@@ -1940,7 +1961,11 @@
                     tb.innerHTML += `<tr class="hover:bg-slate-50 transition-colors text-[11px] md:text-sm animate-fade-in-up" style="animation-delay: ${idx * 0.05}s">
                         <td class="p-2 md:p-3 align-top"><span class="font-bold text-slate-700">${h.tgl}</span><br><span class="text-[9px] md:text-xs text-slate-400 font-mono">${h.jam}</span></td>
                         <td class="p-2 md:p-3 align-top text-slate-600"><div class="font-medium mb-1"><b class="text-[9px] md:text-xs text-slate-400">S:</b> ${h.keluhan||'-'}</div><div class="text-[10px] md:text-xs text-slate-500 mt-1 md:mt-2"><b class="text-[9px] md:text-[10px] text-slate-400">O:</b> ${h.pemeriksaanFisik||'-'}</div></td>
-                        <td class="p-2 md:p-3 align-top text-[10px] md:text-xs text-slate-500"><span class="font-mono bg-slate-100 px-1 rounded border border-slate-200">TD: ${h.td||'-'}</span><br><span class="font-mono bg-slate-100 px-1 rounded mt-1 inline-block border border-slate-200">S: ${h.suhu?h.suhu+'°C':'-'}</span></td>
+                        <td class="p-2 md:p-3 align-top text-[10px] md:text-xs text-slate-500">
+                            <span class="font-mono bg-slate-100 px-1 rounded border border-slate-200">TD: ${h.td||'-'}</span><br>
+                            <span class="font-mono bg-slate-100 px-1 rounded mt-1 inline-block border border-slate-200">S: ${h.suhu?h.suhu+'°C':'-'}</span>
+                            ${h.laborat ? `<div class="mt-2 pt-2 border-t border-slate-100"><b class="text-[9px] text-slate-400">Lab:</b><br><span class="whitespace-pre-wrap">${h.laborat}</span></div>` : ''}
+                        </td>
                         <td class="p-2 md:p-3 align-top text-[10px] md:text-xs bg-slate-50/50 rounded-r-lg">
                             <div class="mb-2 border-b border-slate-200 pb-2">${diagTxt || '<i class="text-slate-400">- Belum ada Diagnosa -</i>'}</div>
                             <div class="font-mono text-teal-700 whitespace-pre-wrap">${h.resep||'-'}</div>
@@ -2109,8 +2134,8 @@
                 tr.style.animationDelay = `${idx * 0.05}s`;
                 
                 let btn = blm 
-                    ? `<div class="flex gap-1 justify-center"><button onclick="bukaKonfirmasiBatalAntrean('${row.erm}', '${row.nama.replace(/'/g, "\\'")}', '${row.waktuDaftar}', 'antrean')" class="bg-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white px-2 py-1.5 md:py-2 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center shrink-0" title="Batal Antrean"><i class="fas fa-times"></i></button><button onclick="bukaFormPelayanan('${row.erm}')" class="bg-gradient-to-r from-blue-500 to-blue-700 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:py-2 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 w-full flex items-center justify-center"><i class="fas fa-stethoscope mr-1 md:mr-2 text-[10px] md:text-sm"></i> Periksa</button></div>`
-                    : `<div class="flex gap-1 justify-center"><button onclick="bukaKonfirmasiBatalAntrean('${row.erm}', '${row.nama.replace(/'/g, "\\'")}', '${row.waktuDaftar}', 'riwayat')" class="bg-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white px-2 py-1.5 md:py-2 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center shrink-0" title="Hapus Riwayat & Antrean"><i class="fas fa-trash-alt"></i></button><button onclick="bukaFormPelayanan('${row.erm}')" class="bg-gradient-to-r from-emerald-400 to-green-600 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:py-2 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 w-full flex items-center justify-center"><i class="fas fa-edit mr-1 md:mr-2 text-[10px] md:text-sm"></i> Edit Hasil</button></div>`;
+                    ? `<div class="flex gap-1 justify-center"><button onclick="bukaKonfirmasiBatalAntrean('${row.erm}', '${row.nama.replace(/'/g, "\\'")}', '${row.waktuDaftar}', 'antrean')" class="bg-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white px-2 py-1.5 md:py-2 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center shrink-0" title="Batal Antrean"><i class="fas fa-times"></i></button><button onclick="bukaFormPelayanan('${row.erm}', '${row.waktuDaftar}')" class="bg-gradient-to-r from-blue-500 to-blue-700 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:py-2 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 w-full flex items-center justify-center"><i class="fas fa-stethoscope mr-1 md:mr-2 text-[10px] md:text-sm"></i> Periksa</button></div>`
+                    : `<div class="flex gap-1 justify-center"><button onclick="bukaKonfirmasiBatalAntrean('${row.erm}', '${row.nama.replace(/'/g, "\\'")}', '${row.waktuDaftar}', 'riwayat')" class="bg-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white px-2 py-1.5 md:py-2 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center shrink-0" title="Hapus Riwayat & Antrean"><i class="fas fa-trash-alt"></i></button><button onclick="bukaFormPelayanan('${row.erm}', '${row.waktuDaftar}')" class="bg-gradient-to-r from-emerald-400 to-green-600 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:py-2 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 w-full flex items-center justify-center"><i class="fas fa-edit mr-1 md:mr-2 text-[10px] md:text-sm"></i> Edit Hasil</button></div>`;
 
                 let thn = "0";
                 const pData = patientsData.find(x => x.erm === row.erm);
@@ -2129,8 +2154,13 @@
         }
 
         let rekamMedisAktif = null;
-        function bukaFormPelayanan(erm) {
-            rekamMedisAktif = [...pelayananData].reverse().find(p => p.erm === erm); if(!rekamMedisAktif) return;
+        function bukaFormPelayanan(erm, waktuDaftar) {
+            rekamMedisAktif = pelayananData.find(p => p.erm === erm && p.waktuDaftar === waktuDaftar); 
+            if(!rekamMedisAktif) {
+                // Fallback untuk kompabilitas
+                rekamMedisAktif = [...pelayananData].reverse().find(p => p.erm === erm);
+            }
+            if(!rekamMedisAktif) return;
             document.getElementById('info_nama_pelayanan').textContent = rekamMedisAktif.nama; 
             document.getElementById('info_erm_pelayanan').innerHTML = `${rekamMedisAktif.erm} <span class="text-[10px] font-normal text-slate-500 ml-2 border-l border-blue-200 pl-2">NIK: ${rekamMedisAktif.nik && rekamMedisAktif.nik !== '-' ? rekamMedisAktif.nik : '-'}</span>`;
             
@@ -2151,6 +2181,7 @@
             if(rekamMedisAktif) {
                 const idx = pelayananData.findIndex(p => p.erm === rekamMedisAktif.erm && p.waktuDaftar === rekamMedisAktif.waktuDaftar);
                 let logRiwayat = null;
+                let isNewSelesai = false;
                 if(idx !== -1) {
                     ['keluhan','pemeriksaan_fisik','td','nadi','nafas','suhu','spo2','tb','bb','laborat','diagnosa1','diagnosa2','diagnosa3','resep'].forEach(k => { 
                         const elem = document.getElementById('pel_'+k);
@@ -2168,13 +2199,32 @@
                     if(pelayananData[idx].status === 'antrean_medis') {
                         pelayananData[idx].status = 'antrean_kasir'; 
                         pelayananData[idx].waktuMedisSelesai = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                        isNewSelesai = true;
                         const ts = new Date(pelayananData[idx].tanggalSistem);
                         logRiwayat = { 
                             erm: pelayananData[idx].erm, tgl: ts.toLocaleDateString('id-ID'), jam: ts.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}), 
                             keluhan: pelayananData[idx].keluhan, pemeriksaanFisik: pelayananData[idx].pemeriksaanFisik, td: pelayananData[idx].td, suhu: pelayananData[idx].suhu, 
+                            laborat: pelayananData[idx].laborat,
                             diagnosa1: pelayananData[idx].diagnosa1, diagnosa2: pelayananData[idx].diagnosa2, diagnosa3: pelayananData[idx].diagnosa3, resep: pelayananData[idx].resep 
                         };
                         riwayatMedisGlobal.push(logRiwayat);
+                    } else {
+                        // Fitur Edit Hasil jika sudah dikirim ke kasir / riwayat telah terbentuk
+                        const ts = new Date(pelayananData[idx].tanggalSistem);
+                        const jamStr = ts.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+                        let rIdx = riwayatMedisGlobal.findIndex(r => r.erm === pelayananData[idx].erm && r.jam === jamStr);
+                        if(rIdx !== -1) {
+                            riwayatMedisGlobal[rIdx].keluhan = pelayananData[idx].keluhan;
+                            riwayatMedisGlobal[rIdx].pemeriksaanFisik = pelayananData[idx].pemeriksaanFisik;
+                            riwayatMedisGlobal[rIdx].td = pelayananData[idx].td;
+                            riwayatMedisGlobal[rIdx].suhu = pelayananData[idx].suhu;
+                            riwayatMedisGlobal[rIdx].laborat = pelayananData[idx].laborat;
+                            riwayatMedisGlobal[rIdx].diagnosa1 = pelayananData[idx].diagnosa1;
+                            riwayatMedisGlobal[rIdx].diagnosa2 = pelayananData[idx].diagnosa2;
+                            riwayatMedisGlobal[rIdx].diagnosa3 = pelayananData[idx].diagnosa3;
+                            riwayatMedisGlobal[rIdx].resep = pelayananData[idx].resep;
+                            logRiwayat = riwayatMedisGlobal[rIdx];
+                        }
                     }
                 }
                 
@@ -2192,7 +2242,14 @@
                         };
                         const { error } = await supabaseClient.from('pelayanan').update(dataToServer).match({ erm: target.erm, waktuDaftar: target.waktuDaftar });
                         if (error) throw error;
-                        if(logRiwayat) await supabaseClient.from('riwayat').insert(logRiwayat);
+                        
+                        if(logRiwayat) {
+                            if (isNewSelesai) {
+                                await supabaseClient.from('riwayat').insert(logRiwayat);
+                            } else {
+                                await supabaseClient.from('riwayat').update(logRiwayat).match({ erm: logRiwayat.erm, jam: logRiwayat.jam });
+                            }
+                        }
                     } catch(err) { showToast('Gagal sinkron server: '+err.message, 'warning'); }
                 }
             }
@@ -2269,8 +2326,8 @@
                 tr.style.animationDelay = `${idx * 0.05}s`;
                 
                 let btn = lunas 
-                    ? `<button onclick="bukaFormKasir('${row.erm}')" class="bg-gradient-to-r from-slate-600 to-slate-800 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:py-2 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 w-full flex justify-center items-center"><i class="fas fa-print mr-1 md:mr-2"></i> Cetak</button>`
-                    : `<button onclick="bukaFormKasir('${row.erm}')" class="bg-gradient-to-r from-orange-400 to-orange-600 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:py-2 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 w-full flex justify-center items-center"><i class="fas fa-wallet mr-1 md:mr-2"></i> Bayar</button>`;
+                    ? `<button onclick="bukaFormKasir('${row.erm}', '${row.waktuDaftar}')" class="bg-gradient-to-r from-slate-600 to-slate-800 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:py-2 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 w-full flex justify-center items-center"><i class="fas fa-print mr-1 md:mr-2"></i> Cetak</button>`
+                    : `<button onclick="bukaFormKasir('${row.erm}', '${row.waktuDaftar}')" class="bg-gradient-to-r from-orange-400 to-orange-600 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:py-2 rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-0.5 w-full flex justify-center items-center"><i class="fas fa-wallet mr-1 md:mr-2"></i> Bayar</button>`;
 
                 tr.innerHTML = `
                     <td class="p-2 md:p-3 text-center font-bold text-slate-500">${idx+1}</td>
@@ -2290,8 +2347,13 @@
         }
 
         let pasienKasirAktif = null;
-        function bukaFormKasir(erm) {
-            pasienKasirAktif = [...pelayananData].reverse().find(p => p.erm === erm && (p.status === 'antrean_kasir' || p.status === 'selesai_kasir')); if(!pasienKasirAktif) return;
+        function bukaFormKasir(erm, waktuDaftar) {
+            pasienKasirAktif = pelayananData.find(p => p.erm === erm && p.waktuDaftar === waktuDaftar && (p.status === 'antrean_kasir' || p.status === 'selesai_kasir')); 
+            if(!pasienKasirAktif) {
+                // Fallback untuk kompabilitas
+                pasienKasirAktif = [...pelayananData].reverse().find(p => p.erm === erm && (p.status === 'antrean_kasir' || p.status === 'selesai_kasir')); 
+            }
+            if(!pasienKasirAktif) return;
             document.getElementById('info_nama_kasir').textContent = pasienKasirAktif.nama; 
             document.getElementById('info_erm_kasir').innerHTML = `${pasienKasirAktif.erm} <span class="text-slate-400 font-normal text-[10px] ml-2">NIK: ${pasienKasirAktif.nik && pasienKasirAktif.nik !== '-' ? pasienKasirAktif.nik : '-'}</span>`;
             document.getElementById('info_resep_kasir').textContent = pasienKasirAktif.resep || '-';
